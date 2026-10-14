@@ -1,6 +1,6 @@
 # SPEC 01 — MVP visual de Arcade Vault (todas las pantallas)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguna
 > **Fecha:** 2026-10-14
 > **Objetivo:** Implementar en Next.js, con datos mock y sin ningún juego real, las cinco pantallas de `references/` (Biblioteca, Detalle, Reproductor, Acceso y Salón de la Fama) con su navegación, para tener el MVP visual navegable.
@@ -107,26 +107,26 @@ Cada paso deja la app compilando y ejecutable.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
-- [ ] No hay errores ni warnings de hidratación en la consola del navegador en ninguna de las 5 pantallas.
-- [ ] `/` muestra el hero "ARCADE VAULT" y 8 tarjetas de juego.
-- [ ] Escribir "caí" en el buscador deja solo la tarjeta CAÍDA (búsqueda sin distinguir mayúsculas).
-- [ ] El chip SHOOTER muestra exactamente 2 juegos (INVASORES y ROCAS).
-- [ ] Una búsqueda sin coincidencias muestra "NO HAY RESULTADOS".
-- [ ] Clic en una tarjeta lleva a `/juegos/<id>` con título, descripción larga, 3 estadísticas y 10 filas de leaderboard.
-- [ ] `/juegos/no-existe` muestra la página 404.
-- [ ] JUGAR AHORA lleva a `/juegos/<id>/jugar`; SALIR en el reproductor vuelve a `/juegos/<id>`.
-- [ ] En el reproductor la puntuación aumenta sola; PAUSA la detiene y muestra "EN PAUSA"; REANUDAR la retoma.
-- [ ] FIN abre el modal "FIN DEL JUEGO" con la puntuación final formateada en `es-ES`.
-- [ ] GUARDAR PUNTUACIÓN añade una entrada `{ game, score, name, at }` a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA".
-- [ ] JUGAR DE NUEVO reinicia puntuación, vidas y nivel, y cierra el modal.
-- [ ] En `/acceso`, enviar el formulario con usuario "px_kai" guarda `{"name":"PX_KAI"}` en `av_user`, redirige a `/` y la Nav muestra `PX_KAI`.
-- [ ] Tras recargar la página la sesión se mantiene; "Cerrar sesión" borra `av_user` y la Nav vuelve a mostrar "Iniciar Sesión".
-- [ ] La pestaña CREAR CUENTA muestra el campo de correo; INICIAR SESIÓN lo oculta.
-- [ ] `/salon` muestra podio, 12 filas y cambia el contenido al seleccionar otro juego.
-- [ ] Con sesión iniciada, `/salon` muestra la fila "TU MEJOR MARCA"; sin sesión no aparece.
-- [ ] En ancho < 768 px aparece el botón de menú; el panel móvil abre, enlaza a todas las secciones y se cierra al navegar.
-- [ ] Las cinco pantallas son visualmente equivalentes a `references/Arcade Vault.html` (comparación lado a lado).
+- [x] `npm run lint` y `npm run build` terminan sin errores.
+- [x] No hay errores ni warnings de hidratación en la consola del navegador en ninguna de las 5 pantallas.
+- [x] `/` muestra el hero "ARCADE VAULT" y 8 tarjetas de juego.
+- [x] Escribir "caí" en el buscador deja solo la tarjeta CAÍDA (búsqueda sin distinguir mayúsculas).
+- [x] El chip SHOOTER muestra exactamente 2 juegos (INVASORES y ROCAS).
+- [x] Una búsqueda sin coincidencias muestra "NO HAY RESULTADOS".
+- [x] Clic en una tarjeta lleva a `/juegos/<id>` con título, descripción larga, 3 estadísticas y 10 filas de leaderboard.
+- [x] `/juegos/no-existe` muestra la página 404.
+- [x] JUGAR AHORA lleva a `/juegos/<id>/jugar`; SALIR en el reproductor vuelve a `/juegos/<id>`.
+- [x] En el reproductor la puntuación aumenta sola; PAUSA la detiene y muestra "EN PAUSA"; REANUDAR la retoma.
+- [x] FIN abre el modal "FIN DEL JUEGO" con la puntuación final formateada en `es-ES`.
+- [x] GUARDAR PUNTUACIÓN añade una entrada `{ game, score, name, at }` a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA".
+- [x] JUGAR DE NUEVO reinicia puntuación, vidas y nivel, y cierra el modal.
+- [x] En `/acceso`, enviar el formulario con usuario "px_kai" guarda `{"name":"PX_KAI"}` en `av_user`, redirige a `/` y la Nav muestra `PX_KAI`.
+- [x] Tras recargar la página la sesión se mantiene; "Cerrar sesión" borra `av_user` y la Nav vuelve a mostrar "Iniciar Sesión".
+- [x] La pestaña CREAR CUENTA muestra el campo de correo; INICIAR SESIÓN lo oculta.
+- [x] `/salon` muestra podio, 12 filas y cambia el contenido al seleccionar otro juego.
+- [x] Con sesión iniciada, `/salon` muestra la fila "TU MEJOR MARCA"; sin sesión no aparece.
+- [x] En ancho ≤ 840 px (breakpoint ya definido en `app/globals.css`) aparece el botón de menú; el panel móvil abre, enlaza a todas las secciones y se cierra al navegar.
+- [x] Las cinco pantallas son visualmente equivalentes a `references/Arcade Vault.html` (comparación lado a lado).
 
 ---
 
