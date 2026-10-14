@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Arcade Vault: an online platform to play games and compete for the highest score. The project follows Spec-Driven Development (`/spec` and `/spec-impl`), using the skills from `Klerith/fernando-skills` (`npx skills@latest add Klerith/fernando-skills`). The codebase is currently the untouched `create-next-app` scaffold (`app/page.tsx` is still the default template, layout metadata is still "Create Next App").
+Arcade Vault: an online platform to play games and compete for the highest score. The project follows Spec-Driven Development (`/spec` and `/spec-impl`), using the skills from `Klerith/fernando-skills` (`npx skills@latest add Klerith/fernando-skills`). SPEC 01 (`specs/01-mvp-pantallas-visuales.md`) implements the visual MVP: all five screens with mock data and no real games. `references/` holds the original prototype (React + Babel, ignored by ESLint); it is the visual source of truth.
 
 ## Commands
 
@@ -30,4 +30,8 @@ This uses Next.js 16.4 / React 19.3, which has breaking changes versus common tr
 - App Router only (`app/`); path alias `@/*` maps to the repo root.
 - `next.config.ts` enables `cacheComponents`, `partialPrefetching` and `experimental.agentFeedback`. `cacheComponents` changes caching/dynamic-rendering semantics, so check the docs before using data fetching or dynamic APIs.
 - Tailwind v4 is wired through a Turbopack rule (`@tailwindcss/turbopack` loader for `*.css`) rather than PostCSS. Theme tokens live in `app/globals.css` (`@theme inline`, light/dark via `prefers-color-scheme`).
+- Routes: `/` (library), `/juegos/[id]` (detail), `/juegos/[id]/jugar` (simulated player), `/acceso` (auth), `/salon` (hall of fame). UI is Spanish.
+- Mock data lives in `lib/games.ts` and `lib/scores.ts` (deterministic `seededScores`). Components are in `components/`; styles reuse the classes in `app/globals.css` rather than Tailwind utilities.
+- Session is simulated: `lib/session.ts` + `SessionProvider` read `localStorage` (`av_user`, `av_scores`) through `useSyncExternalStore`. Don't use `useEffect` + `setState` for this (the `react-hooks/set-state-in-effect` lint rule rejects it).
+- Pages that read `params` do it inside `<Suspense>` (see `app/juegos/[id]/page.tsx`) to keep the App Shell shared; `Nav` is also wrapped in `Suspense` because `usePathname` can suspend with `cacheComponents`.
 - `app/layout.tsx` types its props with the global `LayoutProps<"/">` helper (generated route types), not a hand-written props type.

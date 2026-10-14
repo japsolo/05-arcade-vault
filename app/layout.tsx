@@ -4,6 +4,10 @@ import {
 	JetBrains_Mono,
 	Press_Start_2P,
 } from "next/font/google";
+import { Suspense } from "react";
+import { Footer } from "@/components/footer";
+import { Nav } from "@/components/nav";
+import { SessionProvider } from "@/components/session-provider";
 import "./globals.css";
 
 const pressStart = Press_Start_2P({
@@ -39,7 +43,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			<body className="min-h-full">
 				<div className="av-bg" />
 				<div className="av-noise" />
-				<div className="av-root">{children}</div>
+				<div className="av-root">
+					<SessionProvider>
+						{/* usePathname puede suspender con cacheComponents */}
+						<Suspense fallback={null}>
+							<Nav />
+						</Suspense>
+						<main className="av-main">{children}</main>
+						<Footer />
+					</SessionProvider>
+				</div>
 			</body>
 		</html>
 	);
