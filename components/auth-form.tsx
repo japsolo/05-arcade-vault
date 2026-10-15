@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 
 type Tab = "in" | "up";
 
@@ -19,12 +19,12 @@ export function AuthForm() {
 	const submit = (e: FormEvent) => {
 		e.preventDefault();
 		login({ name: (username || "PLAYER1").toUpperCase().slice(0, 10) });
-		router.push("/");
+		router.push("/biblioteca");
 	};
 
 	const playAsGuest = () => {
 		login(null);
-		router.push("/");
+		router.push("/biblioteca");
 	};
 
 	return (

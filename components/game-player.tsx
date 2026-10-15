@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 import type { Game } from "@/lib/games";
 import { saveScore } from "@/lib/session";
 
@@ -154,7 +154,7 @@ export function GamePlayer({ game }: { game: Game }) {
 							<button type="button" className="btn" onClick={restart}>
 								JUGAR DE NUEVO
 							</button>
-							<Link href="/" className="btn magenta">
+							<Link href="/biblioteca" className="btn magenta">
 								VOLVER AL VAULT
 							</Link>
 						</div>

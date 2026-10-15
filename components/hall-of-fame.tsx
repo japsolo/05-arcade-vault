@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 import { GAMES } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 
@@ -120,7 +120,7 @@ export function HallOfFame() {
 			</div>
 
 			<div style={{ textAlign: "center", marginTop: 32 }}>
-				<Link href="/" className="btn lg">
+				<Link href="/biblioteca" className="btn lg">
 					VOLVER A LA BIBLIOTECA
 				</Link>
 			</div>
