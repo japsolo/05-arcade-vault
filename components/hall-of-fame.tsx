@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 import { GAMES } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 

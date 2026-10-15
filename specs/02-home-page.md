@@ -1,6 +1,6 @@
 # SPEC 02 — Home page (landing) y mover la Biblioteca a `/biblioteca`
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-14
 > **Objetivo:** Crear la landing de Arcade Vault en `/` a partir de `references/home-about/` (home, nav y estilos), mover la Biblioteca a `/biblioteca` y actualizar la Nav y todos los enlaces afectados.
@@ -26,6 +26,7 @@ La SPEC 01 dejó la Biblioteca en `/`. El prototipo de `references/home-about/` 
 - Datos mock de la home (actividad, top jugadores, estadísticas, features, precios, FAQ) tipados en `lib/home.ts`.
 - `metadata` de la home en español.
 - Con sesión iniciada, los CTA de registro cambian (ver Decisiones).
+- Correcciones en la Nav y la sesión (SPEC 01) detectadas al verificar la home en el navegador, ampliadas al alcance a petición del usuario (ver paso 7): error de hidratación con sesión iniciada, scroll horizontal a 390 px y alineación del texto de los botones.
 
 **Fuera de alcance (para otras specs):**
 
@@ -89,30 +90,39 @@ Cada paso deja la app compilando y ejecutable.
    - Cada `MiniCard` → `/juegos/[id]`.
    Usar `<Link>`, no `<button onClick>`. `metadata.title`: "Arcade Vault · El arcade clásico está de vuelta". Comprobación: la home se ve equivalente a la referencia y todos los enlaces navegan.
 6. **Pulido y verificación.** Revisar responsive (≤ 840 px, y los breakpoints propios de HOME/ACTIVITY/PRICING), comprobar que no hay errores de hidratación, que `reveal` funciona al hacer scroll y que `prefers-reduced-motion` no deja contenido invisible si la referencia lo cubre. Actualizar `CLAUDE.md` (rutas: `/` home, `/biblioteca`, y mención de `lib/home.ts`) y marcar la SPEC 02 como `Implementado`.
+   *Hecho:* se verificó en el navegador (escritorio 1280 px y móvil 390 px) comparando con la referencia servida en local; la Nav y el hero coinciden con el prototipo. `CLAUDE.md` actualizado (rutas, home, `lib/home.ts`).
+7. **Correcciones detectadas en la verificación (añadido tras el paso 6).** Tres defectos de la Nav/sesión heredados de la SPEC 01, corregidos aquí por decisión del usuario:
+   - **Hidratación con sesión.** Con `av_user` en `localStorage`, la Nav daba "Hydration failed" (el servidor pintaba `<a>Iniciar Sesión</a>` y el cliente `<button>`) en todas las rutas. Causa: `SessionProvider` cambiaba su valor justo tras hidratar y la Nav, dentro de un `Suspense` que suspende por `usePathname`, hidrataba ya con el usuario. Corrección: se elimina el contexto; `useSession` pasa a `lib/use-session.ts` y cada componente lee la sesión con su propio `useSyncExternalStore` (snapshot de servidor `null` durante su hidratación). `components/session-provider.tsx` se borra, `app/layout.tsx` ya no monta `SessionProvider` y los 5 componentes que usaban el hook cambian su import (`nav`, `auth-form`, `game-player`, `hall-of-fame`, `home/home-ctas`). `CLAUDE.md` actualizado.
+   - **Scroll horizontal a 390 px.** El botón de menú se salía 13 px de la Nav. En `app/globals.css`, dentro de `@media (max-width: 840px)`: `.av-nav { gap: 12px }` y `.av-nav .auth-btn { margin-left: 0 }`. A 390 px el ancho de scroll pasa de 403 a 390.
+   - **Alineación del texto de los botones.** Los `<Link className="btn">` alineaban a la izquierda el texto que se parte en dos líneas ("Iniciar Sesión"), a diferencia del `<button>` de la referencia. En `.btn` se añade `text-align: center`.
+   *Verificación:* `npm run lint` y `npm run build` pasan; build de producción servido en el puerto 3100, con sesión iniciada, sin errores de hidratación en `/`, `/biblioteca`, `/salon`, `/juegos/caida/jugar` y `/acceso`. La única entrada de error en consola es el 404 de la precarga de `/acerca-de`.
 
 ---
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
-- [ ] No hay errores ni warnings de hidratación en la consola en `/`, `/biblioteca`, `/juegos/<id>`, `/salon` y `/acceso`.
-- [ ] `/` muestra el hero con el título "EL ARCADE / CLÁSICO ESTÁ / DE VUELTA" y las 8 siluetas decorativas.
-- [ ] `/` contiene, en este orden: hero, "¿POR QUÉ ARCADE VAULT?" (4 tarjetas), "JUEGOS DISPONIBLES AHORA" (6 mini-tarjetas), 3 estadísticas, "ACTIVIDAD EN VIVO" (7 puntuaciones y 5 top jugadores), "PRECIOS" (plan + 3 FAQ) y "¿LISTO PARA JUGAR?".
-- [ ] Las 6 mini-tarjetas son los 6 primeros juegos de `GAMES`; clic en una lleva a `/juegos/<id>`.
-- [ ] EXPLORAR JUEGOS, VER TODOS LOS JUEGOS e INSERTAR MONEDA llevan a `/biblioteca`.
-- [ ] Sin sesión, CREAR CUENTA (hero) y EMPEZAR GRATIS (precios) llevan a `/acceso`.
-- [ ] Con sesión iniciada, el CTA CREAR CUENTA del hero no aparece y EMPEZAR GRATIS pasa a ir a `/biblioteca` con el texto "IR A LA BIBLIOTECA →".
-- [ ] VER SALÓN lleva a `/salon`.
-- [ ] Las secciones con `.reveal` empiezan ocultas y reciben la clase `in` al entrar en el viewport; las puntuaciones usan formato `es-ES` (p. ej. `+184.220`).
-- [ ] `/biblioteca` muestra el mismo contenido que antes en `/` (hero, 8 tarjetas, búsqueda "caí" → CAÍDA, chip SHOOTER → 2 juegos, "NO HAY RESULTADOS").
-- [ ] VOLVER AL VAULT (Detalle y Reproductor) y VOLVER A LA BIBLIOTECA (Salón) llevan a `/biblioteca`.
-- [ ] Enviar el formulario de `/acceso` o pulsar JUGAR COMO INVITADO redirige a `/biblioteca`.
-- [ ] La Nav muestra, en este orden, Inicio · Biblioteca · Salón de la Fama · Acerca de; "Inicio" solo está activo en `/`; "Biblioteca" está activo en `/biblioteca`, `/juegos/<id>` y `/juegos/<id>/jugar`.
-- [ ] El panel móvil (≤ 840 px) lista los 4 enlaces más Iniciar Sesión/Cuenta y se cierra al navegar.
-- [ ] El enlace "Acerca de" navega a `/acerca-de` (404 esperado hasta la spec de About).
-- [ ] `app/globals.css` no contiene estilos de la sección ABOUT PAGE.
-- [ ] La home es visualmente equivalente a `references/home-about/arcade-vault-standalone.html` en escritorio y móvil (comparación lado a lado).
-- [ ] `CLAUDE.md` refleja las nuevas rutas.
+- [x] `npm run lint` y `npm run build` terminan sin errores.
+- [x] No hay errores ni warnings de hidratación en la consola en `/`, `/biblioteca`, `/juegos/<id>`, `/salon` y `/acceso`.
+- [x] `/` muestra el hero con el título "EL ARCADE / CLÁSICO ESTÁ / DE VUELTA" y las 8 siluetas decorativas.
+- [x] `/` contiene, en este orden: hero, "¿POR QUÉ ARCADE VAULT?" (4 tarjetas), "JUEGOS DISPONIBLES AHORA" (6 mini-tarjetas), 3 estadísticas, "ACTIVIDAD EN VIVO" (7 puntuaciones y 5 top jugadores), "PRECIOS" (plan + 3 FAQ) y "¿LISTO PARA JUGAR?".
+- [x] Las 6 mini-tarjetas son los 6 primeros juegos de `GAMES`; clic en una lleva a `/juegos/<id>`.
+- [x] EXPLORAR JUEGOS, VER TODOS LOS JUEGOS e INSERTAR MONEDA llevan a `/biblioteca`.
+- [x] Sin sesión, CREAR CUENTA (hero) y EMPEZAR GRATIS (precios) llevan a `/acceso`.
+- [x] Con sesión iniciada, el CTA CREAR CUENTA del hero no aparece y EMPEZAR GRATIS pasa a ir a `/biblioteca` con el texto "IR A LA BIBLIOTECA →".
+- [x] VER SALÓN lleva a `/salon`.
+- [x] Las secciones con `.reveal` empiezan ocultas y reciben la clase `in` al entrar en el viewport; las puntuaciones usan formato `es-ES` (p. ej. `+184.220`).
+- [x] `/biblioteca` muestra el mismo contenido que antes en `/` (hero, 8 tarjetas, búsqueda "caí" → CAÍDA, chip SHOOTER → 2 juegos, "NO HAY RESULTADOS").
+- [x] VOLVER AL VAULT (Detalle y Reproductor) y VOLVER A LA BIBLIOTECA (Salón) llevan a `/biblioteca`.
+- [x] Enviar el formulario de `/acceso` o pulsar JUGAR COMO INVITADO redirige a `/biblioteca`.
+- [x] La Nav muestra, en este orden, Inicio · Biblioteca · Salón de la Fama · Acerca de; "Inicio" solo está activo en `/`; "Biblioteca" está activo en `/biblioteca`, `/juegos/<id>` y `/juegos/<id>/jugar`.
+- [x] El panel móvil (≤ 840 px) lista los 4 enlaces más Iniciar Sesión/Cuenta y se cierra al navegar.
+- [x] El enlace "Acerca de" navega a `/acerca-de` (404 esperado hasta la spec de About).
+- [x] `app/globals.css` no contiene estilos de la sección ABOUT PAGE.
+- [x] La home es visualmente equivalente a `references/home-about/arcade-vault-standalone.html` en escritorio y móvil (comparación lado a lado).
+- [x] `CLAUDE.md` refleja las nuevas rutas.
+- [x] Con `av_user` en `localStorage` no hay errores de hidratación en `/`, `/biblioteca`, `/salon`, `/juegos/<id>/jugar` ni `/acceso` (paso 7).
+- [x] A 390 px de ancho `document.documentElement.scrollWidth` es 390 (sin scroll horizontal) en `/` (paso 7).
+- [x] El texto de dos líneas de "Iniciar Sesión" en la Nav va centrado (`text-align: center` en `.btn`) (paso 7).
 
 ---
 
@@ -130,6 +140,11 @@ Cada paso deja la app compilando y ejecutable.
 - **No:** `useEffect` + `setState` para el efecto reveal. El observer añade la clase directamente al DOM, compatible con `react-hooks/set-state-in-effect`.
 - **Sí:** reutilizar las clases CSS de `globals.css` en vez de utilidades de Tailwind, igual que la SPEC 01.
 - **Sí:** las estadísticas ("12+ JUEGOS", etc.) se mantienen tal cual la referencia aunque `GAMES` tenga 8 juegos; son texto de marketing.
+- **Sí:** ampliar esta spec con el paso 7 (hidratación con sesión, overflow móvil y alineación de botones), aunque los defectos vengan de la SPEC 01. Decisión del usuario al ver los resultados de la verificación; los tres afectan a pantallas de esta spec (la Nav está en todas).
+- **Sí:** eliminar `SessionProvider` y leer la sesión con `useSyncExternalStore` en cada componente (`lib/use-session.ts`). Cada componente hidrata con el snapshot de servidor aunque otro ya haya leído `localStorage`. Es más simple que un contexto y no necesita proveedor en el layout.
+- **No:** mantener el contexto y proteger solo la Nav con un indicador de "hidratado". Arreglaba la Nav pero dejaba la misma trampa para cualquier componente nuevo que lea la sesión dentro de un `Suspense`.
+- **Sí:** el ajuste móvil de la Nav solo reduce `gap` y quita `margin-left` bajo 840 px; escritorio queda igual que la referencia.
+- **Observado, sin tocar:** a 1280 px la Nav de la referencia (y la nuestra) parte en dos líneas "Salón de la Fama", "Acerca de" y "Iniciar Sesión" porque los elementos se comprimen; es idéntico al prototipo, así que se deja como está. Si se quiere evitar, va en otra spec.
 - **Pendiente de confirmar al revisar:** nombres de archivos de componentes (`components/home/*`) y de `lib/home.ts`; los propuse yo.
 
 ---
@@ -144,7 +159,8 @@ Cada paso deja la app compilando y ejecutable.
 | Elementos `.reveal` quedan invisibles si el observer no corre (JS desactivado, `prefers-reduced-motion`). | Comprobar la CSS de la referencia; si hace falta, mostrar el contenido por defecto cuando no hay JS o con movimiento reducido. |
 | Diferencias de la Nav/globales de la referencia chocan con estilos ya portados. | Comparar `styles.css` con `globals.css` sección por sección en el paso 1 y verificar que las 5 pantallas existentes no cambian. |
 | Mucho CSS sin uso (GAMEPAD, temas). | Aceptado; se usará en la spec de juegos. |
-| El hero con siluetas animadas puede desbordar en móvil. | Revisar con el breakpoint ≤ 840 px y evitar scroll horizontal. |
+| El hero con siluetas animadas puede desbordar en móvil. | Revisar con el breakpoint ≤ 840 px y evitar scroll horizontal. Comprobado: el contenido de la home no desborda; el único desbordamiento era el botón de menú de la Nav (corregido en el paso 7). |
+| El servidor de desarrollo (`next dev`) puede servir CSS antiguo tras editar `app/globals.css` (visto durante el paso 7). | Verificar los cambios de CSS con `npm run build` + `npm run start`, o reiniciar `next dev`. |
 
 ---
 

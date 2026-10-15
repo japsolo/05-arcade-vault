@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 import type { Game } from "@/lib/games";
 import { saveScore } from "@/lib/session";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 
 // CTAs de la home que dependen de la sesión (solo existe en cliente).
 // Sin sesión (y durante la hidratación) se ve la variante de registro.

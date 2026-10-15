@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 
 export function Nav() {
 	const pathname = usePathname();

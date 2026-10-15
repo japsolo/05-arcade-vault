@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/lib/use-session";
 
 type Tab = "in" | "up";
 
