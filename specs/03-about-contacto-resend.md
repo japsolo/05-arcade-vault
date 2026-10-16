@@ -1,6 +1,6 @@
 # SPEC 03 — Página About (`/acerca-de`) con formulario de contacto enviado por Resend
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-10-16
 > **Objetivo:** Crear la página `/acerca-de` fiel a `references/home-about/about.jsx` y hacer que su formulario de contacto envíe un correo real al equipo mediante Resend desde una Server Action.
@@ -107,28 +107,36 @@ Cada paso deja la app compilando y ejecutable.
    - Éxito → `{ status: "sent", name }`.
    Conectar el formulario a `sendContact` y mostrar "▶ TRANSMITIENDO…" con el botón deshabilitado mientras `isPending`. Añadir `CONTACT_TO_EMAIL` a `.env`. Comprobación: envío real recibido en `CONTACT_TO_EMAIL`.
 6. **Pulido y documentación.** Revisar responsive (≤ 840 px y breakpoints propios de ABOUT PAGE), hidratación y comparación visual con `references/home-about/arcade-vault-standalone.html`. Actualizar `CLAUDE.md` (ruta `/acerca-de` ya existe, `lib/contact.ts`, la Server Action y las variables `RESEND_API_KEY` / `CONTACT_TO_EMAIL`) y marcar la SPEC 03 como `Implementado`.
+   *Hecho:* comparación lado a lado con la referencia servida en local, a 1280 px y 390 px, sobre un build de producción. Son equivalentes salvo el textarea (ver Decisiones). Sin errores de hidratación con y sin `av_user`. `CLAUDE.md` actualizado.
+
+**Desviaciones durante la implementación:**
+
+- Paso 4: se añadieron a `app/globals.css`, al final de ABOUT PAGE, estilos que la referencia no trae: `.field-error`, `.form-error`, `[aria-invalid]` (en magenta) y `.hp-field` (oculta el honeypot). Eran necesarios para los estados de error y el honeypot de esta spec.
+- Paso 4: "ENVIAR OTRO MENSAJE" remonta el formulario con una `key` nueva para volver al estado inicial de `useActionState`.
+- Paso 5: `.env.template` (creado por el usuario, con la excepción `!.env.template` en `.gitignore`) incluye `RESEND_API_KEY` y `CONTACT_TO_EMAIL`.
+- Tras el paso 5: `onSubmit` se tipa con `SubmitEvent<HTMLFormElement>` en vez de `FormEvent`, marcado `@deprecated` en `@types/react`.
 
 ---
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
-- [ ] `/acerca-de` responde 200 y la Nav marca "Acerca de" como activo (escritorio y panel móvil).
-- [ ] No hay errores ni warnings de hidratación en la consola en `/acerca-de`, con y sin `av_user` en `localStorage`.
-- [ ] La página muestra, en este orden: hero con "ACERCA DE ARCADE VAULT" y el texto de misión, 3 destacados (HECHO CON ❤️ PARA JUGADORES, JUEGOS EN HTML — CORREN EN CUALQUIER NAVEGADOR, PROYECTO EN CONSTANTE CRECIMIENTO), divisor con 24 píxeles y la sección "CONTÁCTANOS" con 3 tips y el formulario.
-- [ ] El divisor y la sección de contacto empiezan ocultos y reciben la clase `in` al entrar en el viewport.
-- [ ] Pulsar "▶ ENVIAR MENSAJE" con algún campo vacío aplica la clase `shake` al formulario y no hace ninguna petición al servidor.
-- [ ] Un email con formato inválido (p. ej. `jugador@vault`) devuelve un error del servidor junto al campo y el formulario conserva los tres valores.
-- [ ] Un mensaje de más de 2000 caracteres (o nombre de más de 60) devuelve un error del servidor junto al campo.
-- [ ] Mientras se envía, el botón muestra "▶ TRANSMITIENDO…" y está deshabilitado.
-- [ ] Con datos válidos y `.env` correcto, llega un correo real a `CONTACT_TO_EMAIL` desde `onboarding@resend.dev`, con asunto `[Arcade Vault] Nuevo mensaje de {nombre}`, el nombre, el email y el mensaje en el cuerpo, y "Responder" va al correo del usuario.
-- [ ] Tras el envío correcto se ve la terminal con "MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {NOMBRE}." y "ENVIAR OTRO MENSAJE" vuelve al formulario vacío.
-- [ ] Un mensaje con `<b>hola</b>` llega en el correo como texto literal, no como negrita.
-- [ ] Sin `RESEND_API_KEY` (o sin `CONTACT_TO_EMAIL`), enviar muestra el aviso de error bajo el botón, conserva lo escrito y registra el motivo en la consola del servidor.
-- [ ] Con el campo `website` relleno (manipulado desde DevTools) se muestra la terminal de éxito y no se envía ningún correo (no aparece en el panel de Resend).
-- [ ] La API key no aparece en el bundle de cliente (`grep -r "re_" .next/static` no encuentra la clave).
-- [ ] La página es visualmente equivalente a la About de `references/home-about/arcade-vault-standalone.html` en escritorio y móvil, y a 390 px no hay scroll horizontal.
-- [ ] `CLAUDE.md` documenta `/acerca-de`, `lib/contact.ts` y las variables `RESEND_API_KEY` y `CONTACT_TO_EMAIL`.
+- [x] `npm run lint` y `npm run build` terminan sin errores.
+- [x] `/acerca-de` responde 200 y la Nav marca "Acerca de" como activo (escritorio y panel móvil).
+- [x] No hay errores ni warnings de hidratación en la consola en `/acerca-de`, con y sin `av_user` en `localStorage`.
+- [x] La página muestra, en este orden: hero con "ACERCA DE ARCADE VAULT" y el texto de misión, 3 destacados (HECHO CON ❤️ PARA JUGADORES, JUEGOS EN HTML — CORREN EN CUALQUIER NAVEGADOR, PROYECTO EN CONSTANTE CRECIMIENTO), divisor con 24 píxeles y la sección "CONTÁCTANOS" con 3 tips y el formulario.
+- [x] El divisor y la sección de contacto empiezan ocultos y reciben la clase `in` al entrar en el viewport.
+- [x] Pulsar "▶ ENVIAR MENSAJE" con algún campo vacío aplica la clase `shake` al formulario y no hace ninguna petición al servidor.
+- [x] Un email con formato inválido (p. ej. `jugador@vault`) devuelve un error del servidor junto al campo y el formulario conserva los tres valores.
+- [x] Un mensaje de más de 2000 caracteres (o nombre de más de 60) devuelve un error del servidor junto al campo.
+- [x] Mientras se envía, el botón muestra "▶ TRANSMITIENDO…" y está deshabilitado.
+- [x] Con datos válidos y `.env` correcto, llega un correo real a `CONTACT_TO_EMAIL` desde `onboarding@resend.dev`, con asunto `[Arcade Vault] Nuevo mensaje de {nombre}`, el nombre, el email y el mensaje en el cuerpo, y "Responder" va al correo del usuario.
+- [x] Tras el envío correcto se ve la terminal con "MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {NOMBRE}." y "ENVIAR OTRO MENSAJE" vuelve al formulario vacío.
+- [x] Un mensaje con `<b>hola</b>` llega en el correo como texto literal, no como negrita.
+- [x] Sin `RESEND_API_KEY` (o sin `CONTACT_TO_EMAIL`), enviar muestra el aviso de error bajo el botón, conserva lo escrito y registra el motivo en la consola del servidor.
+- [x] Con el campo `website` relleno (manipulado desde DevTools) se muestra la terminal de éxito y no se envía ningún correo (no aparece en el panel de Resend).
+- [x] La API key no aparece en el bundle de cliente (`grep -r "re_" .next/static` no encuentra la clave).
+- [x] La página es visualmente equivalente a la About de `references/home-about/arcade-vault-standalone.html` en escritorio y móvil, y a 390 px no hay scroll horizontal.
+- [x] `CLAUDE.md` documenta `/acerca-de`, `lib/contact.ts` y las variables `RESEND_API_KEY` y `CONTACT_TO_EMAIL`.
 
 ---
 
@@ -154,7 +162,9 @@ Cada paso deja la app compilando y ejecutable.
 - **No:** prerrellenar el nombre con `av_user`. La sesión es simulada y no tiene email; el formulario queda igual que la referencia.
 - **Sí:** verificación con un envío real como criterio de aceptación, más el caso sin API key.
 - **Pendiente de confirmar al revisar:** nombres de archivos (`components/about/*`, `lib/contact.ts`, `app/acerca-de/actions.ts`), los límites de longitud (60 / 254 / 2000), el texto del asunto y el `metadata.title`; los propuse yo.
-- **Pendiente de confirmar al revisar:** no se crea `.env.example` porque `.gitignore` ignora `.env*`; las variables se documentan en `CLAUDE.md`. Alternativa: añadir `!.env.example` al `.gitignore`.
+- **Sí:** `.env.template` versionado (excepción `!.env.template` en `.gitignore`) con las claves sin valores, además de documentarlas en `CLAUDE.md`. Decisión del usuario durante la implementación.
+- **No:** `.env.example` ni documentar las variables solo en `CLAUDE.md`. Era la propuesta inicial; la sustituyó `.env.template`.
+- **Observado, sin tocar:** el textarea es ~15 px más alto que en la referencia y su texto mide 14 px en vez de 13,33 px. Causa: el preflight de Tailwind aplica `font: inherit` a los controles de formulario y la referencia usa los valores por defecto del navegador. Si se quiere igualar, basta con fijar `font-size` y `line-height` en `.contact-form textarea`.
 
 ---
 
