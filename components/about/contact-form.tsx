@@ -1,17 +1,10 @@
 "use client";
 
-import { type FormEvent, useActionState, useState } from "react";
+import { type SubmitEvent, useActionState, useState } from "react";
+import { sendContact } from "@/app/acerca-de/actions";
 import type { ContactState } from "@/lib/contact";
 
 const INITIAL: ContactState = { status: "idle" };
-
-// Acción temporal (paso 4): simula un envío correcto. Se sustituye por la Server Action en el paso 5.
-async function fakeSend(
-	_prev: ContactState,
-	formData: FormData,
-): Promise<ContactState> {
-	return { status: "sent", name: String(formData.get("name") ?? "").trim() };
-}
 
 // "ENVIAR OTRO MENSAJE" remonta el formulario (nueva key) para volver al estado inicial de useActionState.
 export function ContactForm() {
@@ -22,7 +15,7 @@ export function ContactForm() {
 }
 
 function ContactFormRound({ onReset }: { onReset: () => void }) {
-	const [state, formAction] = useActionState(fakeSend, INITIAL);
+	const [state, formAction, pending] = useActionState(sendContact, INITIAL);
 	const [shake, setShake] = useState(false);
 
 	// Los inputs no son controlados: React vacía el formulario tras cada acción, así que
@@ -31,7 +24,7 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 		state.status === "error" ? state.values : { name: "", email: "", msg: "" };
 	const fieldErrors = state.status === "error" ? state.fieldErrors : {};
 
-	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+	const onSubmit = (e: SubmitEvent<HTMLFormElement>) => {
 		const data = new FormData(e.currentTarget);
 		const empty = ["name", "email", "msg"].some(
 			(k) => !String(data.get(k) ?? "").trim(),
@@ -109,8 +102,9 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 						className="btn xl press"
 						type="submit"
 						style={{ width: "100%" }}
+						disabled={pending}
 					>
-						▶ ENVIAR MENSAJE
+						{pending ? "▶ TRANSMITIENDO…" : "▶ ENVIAR MENSAJE"}
 					</button>
 					{state.status === "error" && (
 						<p className="form-error pixel" role="alert">
