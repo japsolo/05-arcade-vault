@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { HighlightIcon, type HighlightKind } from "@/components/about/highlight-icon";
+import { ContactForm } from "@/components/about/contact-form";
+import {
+	HighlightIcon,
+	type HighlightKind,
+} from "@/components/about/highlight-icon";
 import { Reveal } from "@/components/home/reveal";
 import type { AccentColor } from "@/lib/games";
 
@@ -7,11 +11,20 @@ export const metadata: Metadata = {
 	title: "Acerca de · Arcade Vault",
 };
 
-const HIGHLIGHTS: { icon: HighlightKind; text: string; color: AccentColor }[] = [
-	{ icon: "HEART", text: "HECHO CON ❤️ PARA JUGADORES", color: "magenta" },
-	{ icon: "BROWSER", text: "JUEGOS EN HTML — CORREN EN CUALQUIER NAVEGADOR", color: "cyan" },
-	{ icon: "PLANT", text: "PROYECTO EN CONSTANTE CRECIMIENTO", color: "green" },
-];
+const HIGHLIGHTS: { icon: HighlightKind; text: string; color: AccentColor }[] =
+	[
+		{ icon: "HEART", text: "HECHO CON ❤️ PARA JUGADORES", color: "magenta" },
+		{
+			icon: "BROWSER",
+			text: "JUEGOS EN HTML — CORREN EN CUALQUIER NAVEGADOR",
+			color: "cyan",
+		},
+		{
+			icon: "PLANT",
+			text: "PROYECTO EN CONSTANTE CRECIMIENTO",
+			color: "green",
+		},
+	];
 
 export default function AboutPage() {
 	return (
@@ -23,9 +36,10 @@ export default function AboutPage() {
 				<div className="kicker pixel neon-yellow">▸ ACERCA DE</div>
 				<h1 className="about-title">ACERCA DE ARCADE VAULT</h1>
 				<p className="about-mission">
-					ARCADE VAULT nació del amor por los videojuegos clásicos. Nuestra misión es preservar y
-					celebrar los arcades que definieron una generación, haciéndolos accesibles para todos, en
-					cualquier lugar y sin costo.
+					ARCADE VAULT nació del amor por los videojuegos clásicos. Nuestra
+					misión es preservar y celebrar los arcades que definieron una
+					generación, haciéndolos accesibles para todos, en cualquier lugar y
+					sin costo.
 				</p>
 
 				<div className="highlight-row">
@@ -47,6 +61,7 @@ export default function AboutPage() {
 				<div className="div-bar" />
 				<div className="div-pixels">
 					{Array.from({ length: 24 }, (_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: it's a safe implementation
 						<span key={i} style={{ animationDelay: `${i * 80}ms` }} />
 					))}
 				</div>
@@ -60,8 +75,8 @@ export default function AboutPage() {
 						<div className="kicker pixel neon-cyan">▸ CONTACTO</div>
 						<h2 className="contact-title">CONTÁCTANOS</h2>
 						<p className="contact-sub">
-							¿Tienes alguna sugerencia, quieres proponer un juego, o simplemente quieres saludar?
-							Escríbenos.
+							¿Tienes alguna sugerencia, quieres proponer un juego, o
+							simplemente quieres saludar? Escríbenos.
 						</p>
 						<div className="contact-tips">
 							<div className="tip">
@@ -79,8 +94,7 @@ export default function AboutPage() {
 						</div>
 					</div>
 
-					{/* Hueco del formulario: se monta ContactForm en el paso 4. */}
-					<div />
+					<ContactForm />
 				</div>
 			</section>
 		</div>

@@ -1168,6 +1168,12 @@ a { color: inherit; text-decoration: none; }
 .term-body .success { margin-top: 12px; color: var(--green); text-shadow: 0 0 6px rgba(0,255,136,0.45); font-weight: 700; white-space: pre-wrap; }
 .term-body .caret { animation: blink 1s steps(1) infinite; }
 
+/* Contacto: estados de error y honeypot (no están en la referencia) */
+.contact-form [aria-invalid="true"] { border-color: var(--magenta); }
+.field-error { font-family: var(--pixel); font-size: 8px; letter-spacing: 0.12em; color: var(--magenta); text-shadow: 0 0 6px rgba(255,0,110,0.45); }
+.form-error { margin: 14px 0 0; font-size: 9px; letter-spacing: 0.12em; line-height: 1.6; color: var(--magenta); text-shadow: 0 0 6px rgba(255,0,110,0.45); text-align: center; }
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
 /* ===== GAMEPAD ===== */
 .gp {
   position: relative;
