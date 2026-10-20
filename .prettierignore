@@ -4,3 +4,5 @@ node_modules/
 public/
 package-lock.json
 next-env.d.ts
+.agents/
+skills-lock.json
