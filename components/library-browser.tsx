@@ -11,9 +11,7 @@ export function LibraryBrowser() {
 	const filtered = useMemo(() => {
 		const needle = q.toLowerCase();
 		return GAMES.filter(
-			(g) =>
-				(cat === "TODOS" || g.cat === cat) &&
-				g.title.toLowerCase().includes(needle),
+			(g) => (cat === "TODOS" || g.cat === cat) && g.title.toLowerCase().includes(needle),
 		);
 	}, [q, cat]);
 

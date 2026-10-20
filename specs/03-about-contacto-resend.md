@@ -56,12 +56,21 @@ export type ContactField = "name" | "email" | "msg";
 export type ContactInput = { name: string; email: string; msg: string };
 
 export type ContactState =
-  | { status: "idle" }
-  | { status: "error"; message: string; fieldErrors: Partial<Record<ContactField, string>>; values: ContactInput }
-  | { status: "sent"; name: string };
+	| { status: "idle" }
+	| {
+			status: "error";
+			message: string;
+			fieldErrors: Partial<Record<ContactField, string>>;
+			values: ContactInput;
+	  }
+	| { status: "sent"; name: string };
 
 export function validateContact(input: ContactInput): Partial<Record<ContactField, string>>;
-export function buildContactEmail(input: ContactInput): { subject: string; html: string; text: string };
+export function buildContactEmail(input: ContactInput): {
+	subject: string;
+	html: string;
+	text: string;
+};
 ```
 
 Server Action en `app/acerca-de/actions.ts`:
@@ -105,9 +114,9 @@ Cada paso deja la app compilando y ejecutable.
    - Falta `RESEND_API_KEY` o `CONTACT_TO_EMAIL` → `console.error` en servidor y devuelve `error` genérico.
    - Llama a `resend.emails.send({ from, to, replyTo, subject, html, text })`; si la respuesta trae `error` o lanza, `console.error` y devuelve `error` genérico.
    - Éxito → `{ status: "sent", name }`.
-   Conectar el formulario a `sendContact` y mostrar "▶ TRANSMITIENDO…" con el botón deshabilitado mientras `isPending`. Añadir `CONTACT_TO_EMAIL` a `.env`. Comprobación: envío real recibido en `CONTACT_TO_EMAIL`.
+     Conectar el formulario a `sendContact` y mostrar "▶ TRANSMITIENDO…" con el botón deshabilitado mientras `isPending`. Añadir `CONTACT_TO_EMAIL` a `.env`. Comprobación: envío real recibido en `CONTACT_TO_EMAIL`.
 6. **Pulido y documentación.** Revisar responsive (≤ 840 px y breakpoints propios de ABOUT PAGE), hidratación y comparación visual con `references/home-about/arcade-vault-standalone.html`. Actualizar `CLAUDE.md` (ruta `/acerca-de` ya existe, `lib/contact.ts`, la Server Action y las variables `RESEND_API_KEY` / `CONTACT_TO_EMAIL`) y marcar la SPEC 03 como `Implementado`.
-   *Hecho:* comparación lado a lado con la referencia servida en local, a 1280 px y 390 px, sobre un build de producción. Son equivalentes salvo el textarea (ver Decisiones). Sin errores de hidratación con y sin `av_user`. `CLAUDE.md` actualizado.
+   _Hecho:_ comparación lado a lado con la referencia servida en local, a 1280 px y 390 px, sobre un build de producción. Son equivalentes salvo el textarea (ver Decisiones). Sin errores de hidratación con y sin `av_user`. `CLAUDE.md` actualizado.
 
 **Desviaciones durante la implementación:**
 
@@ -170,14 +179,14 @@ Cada paso deja la app compilando y ejecutable.
 
 ## Riesgos identificados
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| Con `onboarding@resend.dev`, Resend rechaza destinatarios que no sean el dueño de la cuenta. | `CONTACT_TO_EMAIL` debe ser ese correo; documentado en `CLAUDE.md`. El error de Resend se registra en servidor y el usuario ve el aviso genérico. |
-| Filtrar la API key al cliente. | Solo se lee en `actions.ts` (`"use server"`), sin `NEXT_PUBLIC_`; criterio de aceptación con `grep` sobre `.next/static`. |
-| Inyección de HTML en el correo a partir del mensaje del usuario. | `buildContactEmail` escapa los tres campos; criterio de aceptación con `<b>hola</b>`. |
-| Next.js 16.4 / React 19.3 y `cacheComponents` cambian el comportamiento de formularios y Server Actions respecto a lo habitual. | Leer la guía en `node_modules/next/dist/docs/01-app/` antes del paso 2. |
-| Spam o abuso del formulario (coste de la cuota de Resend). | Honeypot en esta spec; rate limit o CAPTCHA en otra si hace falta. |
-| `next dev` sirve CSS antiguo tras editar `app/globals.css`. | Verificar con `npm run build` + `npm run start` o reiniciar `next dev`; no lanzar `build` con `dev` corriendo (si pasa, `rm -rf .next`). |
+| Riesgo                                                                                                                          | Mitigación                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Con `onboarding@resend.dev`, Resend rechaza destinatarios que no sean el dueño de la cuenta.                                    | `CONTACT_TO_EMAIL` debe ser ese correo; documentado en `CLAUDE.md`. El error de Resend se registra en servidor y el usuario ve el aviso genérico. |
+| Filtrar la API key al cliente.                                                                                                  | Solo se lee en `actions.ts` (`"use server"`), sin `NEXT_PUBLIC_`; criterio de aceptación con `grep` sobre `.next/static`.                         |
+| Inyección de HTML en el correo a partir del mensaje del usuario.                                                                | `buildContactEmail` escapa los tres campos; criterio de aceptación con `<b>hola</b>`.                                                             |
+| Next.js 16.4 / React 19.3 y `cacheComponents` cambian el comportamiento de formularios y Server Actions respecto a lo habitual. | Leer la guía en `node_modules/next/dist/docs/01-app/` antes del paso 2.                                                                           |
+| Spam o abuso del formulario (coste de la cuota de Resend).                                                                      | Honeypot en esta spec; rate limit o CAPTCHA en otra si hace falta.                                                                                |
+| `next dev` sirve CSS antiguo tras editar `app/globals.css`.                                                                     | Verificar con `npm run build` + `npm run start` o reiniciar `next dev`; no lanzar `build` con `dev` corriendo (si pasa, `rm -rf .next`).          |
 
 ---
 

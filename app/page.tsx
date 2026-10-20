@@ -6,14 +6,7 @@ import { HeroCtas, PricingCta } from "@/components/home/home-ctas";
 import { MiniCard } from "@/components/home/mini-card";
 import { Reveal } from "@/components/home/reveal";
 import { GAMES } from "@/lib/games";
-import {
-	FAQ,
-	FEATURES,
-	HOME_STATS,
-	PRICE_FEATURES,
-	RECENT_SCORES,
-	TOP_PLAYERS,
-} from "@/lib/home";
+import { FAQ, FEATURES, HOME_STATS, PRICE_FEATURES, RECENT_SCORES, TOP_PLAYERS } from "@/lib/home";
 
 export const metadata: Metadata = {
 	title: "Arcade Vault · El arcade clásico está de vuelta",
@@ -94,11 +87,7 @@ export default function HomePage() {
 			<section className="home-stats reveal">
 				<div className="stats-inner">
 					{HOME_STATS.map((st, i) => (
-						<div
-							key={st.u}
-							className="stat-block"
-							style={{ transitionDelay: `${i * 90}ms` }}
-						>
+						<div key={st.u} className="stat-block" style={{ transitionDelay: `${i * 90}ms` }}>
 							<div className="stat-n neon-yellow">{st.n}</div>
 							<div className="stat-u pixel">{st.u}</div>
 							<div className="stat-s">{st.s}</div>
@@ -121,11 +110,7 @@ export default function HomePage() {
 						</div>
 						<div className="ticker">
 							{RECENT_SCORES.map((r, i) => (
-								<div
-									key={r.player}
-									className="tick-row"
-									style={{ animationDelay: `${i * 60}ms` }}
-								>
+								<div key={r.player} className="tick-row" style={{ animationDelay: `${i * 60}ms` }}>
 									<span className={`tk-p neon-${r.color}`}>{r.player}</span>
 									<span className="tk-mid">▸ {r.game}</span>
 									<span className="tk-s">+{r.score.toLocaleString("es-ES")}</span>

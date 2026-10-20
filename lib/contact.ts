@@ -46,7 +46,11 @@ function escapeHtml(s: string): string {
 		.replace(/'/g, "&#39;");
 }
 
-export function buildContactEmail(input: ContactInput): { subject: string; html: string; text: string } {
+export function buildContactEmail(input: ContactInput): {
+	subject: string;
+	html: string;
+	text: string;
+} {
 	const name = escapeHtml(input.name);
 	const email = escapeHtml(input.email);
 	const msg = escapeHtml(input.msg).replace(/\r?\n/g, "<br>");

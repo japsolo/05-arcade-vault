@@ -24,8 +24,7 @@ export function GameCard({ game }: { game: Game }) {
 		if (el) el.style.transform = "";
 	};
 
-	const btnColor =
-		game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "";
+	const btnColor = game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "";
 
 	return (
 		// biome-ignore lint/a11y/useKeyWithClickEvents: el enlace JUGAR es la vía accesible por teclado

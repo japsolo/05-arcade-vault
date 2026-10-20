@@ -47,18 +47,29 @@ Estructuras nuevas en `lib/home.ts`; reutiliza `GAMES` y `AccentColor` de la SPE
 // lib/home.ts
 import type { AccentColor } from "@/lib/games";
 
-export type Feature = { icon: "GAMEPAD" | "FREE" | "TROPHY" | "ROCKET"; title: string; desc: string; color: AccentColor };
+export type Feature = {
+	icon: "GAMEPAD" | "FREE" | "TROPHY" | "ROCKET";
+	title: string;
+	desc: string;
+	color: AccentColor;
+};
 export type HomeStat = { n: string; u: string; s: string };
-export type RecentScore = { player: string; game: string; score: number; when: string; color: AccentColor };
+export type RecentScore = {
+	player: string;
+	game: string;
+	score: number;
+	when: string;
+	color: AccentColor;
+};
 export type TopPlayer = { rank: number; player: string; score: number };
 export type FaqItem = { q: string; a: string };
 
-export const FEATURES: Feature[];       // 4 elementos, textos de home.jsx
-export const HOME_STATS: HomeStat[];    // 3 elementos: "12+", "MILES", "GLOBAL"
+export const FEATURES: Feature[]; // 4 elementos, textos de home.jsx
+export const HOME_STATS: HomeStat[]; // 3 elementos: "12+", "MILES", "GLOBAL"
 export const RECENT_SCORES: RecentScore[]; // 7 elementos
-export const TOP_PLAYERS: TopPlayer[];  // 5 elementos
-export const PRICE_FEATURES: string[];  // 6 ítems de la lista del plan
-export const FAQ: FaqItem[];            // 3 elementos
+export const TOP_PLAYERS: TopPlayer[]; // 5 elementos
+export const PRICE_FEATURES: string[]; // 6 ítems de la lista del plan
+export const FAQ: FaqItem[]; // 3 elementos
 ```
 
 Convenciones:
@@ -80,7 +91,7 @@ Cada paso deja la app compilando y ejecutable.
    - `app/juegos/[id]/page.tsx` (VOLVER AL VAULT), `components/game-player.tsx` (VOLVER AL VAULT), `components/hall-of-fame.tsx` (VOLVER A LA BIBLIOTECA) → `/biblioteca`.
    - `components/auth-form.tsx`: las dos llamadas `router.push("/")` → `/biblioteca`.
    - `components/nav.tsx`: el enlace "Biblioteca" → `/biblioteca`; `isLibrary` pasa a `pathname.startsWith("/biblioteca") || pathname.startsWith("/juegos")`.
-   `app/page.tsx` queda temporalmente sin cambios hasta el paso 5. Comprobación: `/biblioteca` funciona con filtros y búsqueda; los botones de volver y el login llevan a `/biblioteca`.
+     `app/page.tsx` queda temporalmente sin cambios hasta el paso 5. Comprobación: `/biblioteca` funciona con filtros y búsqueda; los botones de volver y el login llevan a `/biblioteca`.
 3. **Nav.** En `components/nav.tsx` añadir "Inicio" (`/`, activo solo con `pathname === "/"`) y "Acerca de" (`/acerca-de`, activo con `startsWith`), en la barra y en el panel móvil, en el orden de la referencia: Inicio · Biblioteca · Salón de la Fama · Acerca de. El logo sigue enlazando a `/`. Comprobación: estados activos correctos en `/`, `/biblioteca`, `/juegos/x`, `/salon`; el menú móvil muestra los 4 enlaces + cuenta.
 4. **Datos y componentes de la home.** Crear `lib/home.ts` y los componentes: `components/home/floating-silhouettes.tsx` (8 SVG), `components/home/feature-icon.tsx`, `components/home/mini-card.tsx` (enlace a `/juegos/[id]`), `components/home/reveal.tsx` (cliente: aplica `.reveal` → `.in` con IntersectionObserver, `threshold: 0.12`, desconecta al desmontar) y `components/home/home-ctas.tsx` (cliente, lee la sesión para los CTA). Las secciones estáticas pueden ser componentes de servidor. Seguir la regla `react-hooks/set-state-in-effect`: el observer solo añade clases al DOM, sin `setState`. Comprobación: `npm run lint` y `npm run build` pasan.
 5. **Página `/`.** Reemplazar `app/page.tsx` con la home: hero (eyebrow, título de 3 líneas, subtítulo, CTAs, indicador "DESLIZA"), WHY, GAMES PREVIEW, STATS, ACTIVITY, PRICING y FINAL CTA. Enlaces:
@@ -88,14 +99,14 @@ Cada paso deja la app compilando y ejecutable.
    - CREAR CUENTA y EMPEZAR GRATIS → `/acceso` (sin sesión).
    - VER SALÓN → `/salon`.
    - Cada `MiniCard` → `/juegos/[id]`.
-   Usar `<Link>`, no `<button onClick>`. `metadata.title`: "Arcade Vault · El arcade clásico está de vuelta". Comprobación: la home se ve equivalente a la referencia y todos los enlaces navegan.
+     Usar `<Link>`, no `<button onClick>`. `metadata.title`: "Arcade Vault · El arcade clásico está de vuelta". Comprobación: la home se ve equivalente a la referencia y todos los enlaces navegan.
 6. **Pulido y verificación.** Revisar responsive (≤ 840 px, y los breakpoints propios de HOME/ACTIVITY/PRICING), comprobar que no hay errores de hidratación, que `reveal` funciona al hacer scroll y que `prefers-reduced-motion` no deja contenido invisible si la referencia lo cubre. Actualizar `CLAUDE.md` (rutas: `/` home, `/biblioteca`, y mención de `lib/home.ts`) y marcar la SPEC 02 como `Implementado`.
-   *Hecho:* se verificó en el navegador (escritorio 1280 px y móvil 390 px) comparando con la referencia servida en local; la Nav y el hero coinciden con el prototipo. `CLAUDE.md` actualizado (rutas, home, `lib/home.ts`).
+   _Hecho:_ se verificó en el navegador (escritorio 1280 px y móvil 390 px) comparando con la referencia servida en local; la Nav y el hero coinciden con el prototipo. `CLAUDE.md` actualizado (rutas, home, `lib/home.ts`).
 7. **Correcciones detectadas en la verificación (añadido tras el paso 6).** Tres defectos de la Nav/sesión heredados de la SPEC 01, corregidos aquí por decisión del usuario:
    - **Hidratación con sesión.** Con `av_user` en `localStorage`, la Nav daba "Hydration failed" (el servidor pintaba `<a>Iniciar Sesión</a>` y el cliente `<button>`) en todas las rutas. Causa: `SessionProvider` cambiaba su valor justo tras hidratar y la Nav, dentro de un `Suspense` que suspende por `usePathname`, hidrataba ya con el usuario. Corrección: se elimina el contexto; `useSession` pasa a `lib/use-session.ts` y cada componente lee la sesión con su propio `useSyncExternalStore` (snapshot de servidor `null` durante su hidratación). `components/session-provider.tsx` se borra, `app/layout.tsx` ya no monta `SessionProvider` y los 5 componentes que usaban el hook cambian su import (`nav`, `auth-form`, `game-player`, `hall-of-fame`, `home/home-ctas`). `CLAUDE.md` actualizado.
    - **Scroll horizontal a 390 px.** El botón de menú se salía 13 px de la Nav. En `app/globals.css`, dentro de `@media (max-width: 840px)`: `.av-nav { gap: 12px }` y `.av-nav .auth-btn { margin-left: 0 }`. A 390 px el ancho de scroll pasa de 403 a 390.
    - **Alineación del texto de los botones.** Los `<Link className="btn">` alineaban a la izquierda el texto que se parte en dos líneas ("Iniciar Sesión"), a diferencia del `<button>` de la referencia. En `.btn` se añade `text-align: center`.
-   *Verificación:* `npm run lint` y `npm run build` pasan; build de producción servido en el puerto 3100, con sesión iniciada, sin errores de hidratación en `/`, `/biblioteca`, `/salon`, `/juegos/caida/jugar` y `/acceso`. La única entrada de error en consola es el 404 de la precarga de `/acerca-de`.
+     _Verificación:_ `npm run lint` y `npm run build` pasan; build de producción servido en el puerto 3100, con sesión iniciada, sin errores de hidratación en `/`, `/biblioteca`, `/salon`, `/juegos/caida/jugar` y `/acceso`. La única entrada de error en consola es el 404 de la precarga de `/acerca-de`.
 
 ---
 
@@ -151,16 +162,16 @@ Cada paso deja la app compilando y ejecutable.
 
 ## Riesgos identificados
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| Next.js 16.4 / React 19.3 y `cacheComponents` cambian el comportamiento habitual. | Leer la guía en `node_modules/next/dist/docs/` antes de escribir las páginas; la home no lee `params`, pero la Nav usa `usePathname` y ya va en `Suspense`. |
-| Enlaces a `/` que se quedan sin actualizar y llevan a la landing en vez de a la Biblioteca. | Plan, paso 2 lista los archivos; verificar con `grep` de `href="/"` y `router.push("/")` tras el cambio. |
-| El enlace "Acerca de" da 404. | Aceptado por decisión del usuario; se resuelve en la spec de About. |
-| Elementos `.reveal` quedan invisibles si el observer no corre (JS desactivado, `prefers-reduced-motion`). | Comprobar la CSS de la referencia; si hace falta, mostrar el contenido por defecto cuando no hay JS o con movimiento reducido. |
-| Diferencias de la Nav/globales de la referencia chocan con estilos ya portados. | Comparar `styles.css` con `globals.css` sección por sección en el paso 1 y verificar que las 5 pantallas existentes no cambian. |
-| Mucho CSS sin uso (GAMEPAD, temas). | Aceptado; se usará en la spec de juegos. |
-| El hero con siluetas animadas puede desbordar en móvil. | Revisar con el breakpoint ≤ 840 px y evitar scroll horizontal. Comprobado: el contenido de la home no desborda; el único desbordamiento era el botón de menú de la Nav (corregido en el paso 7). |
-| El servidor de desarrollo (`next dev`) puede servir CSS antiguo tras editar `app/globals.css` (visto durante el paso 7). | Verificar los cambios de CSS con `npm run build` + `npm run start`, o reiniciar `next dev`. |
+| Riesgo                                                                                                                   | Mitigación                                                                                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Next.js 16.4 / React 19.3 y `cacheComponents` cambian el comportamiento habitual.                                        | Leer la guía en `node_modules/next/dist/docs/` antes de escribir las páginas; la home no lee `params`, pero la Nav usa `usePathname` y ya va en `Suspense`.                                      |
+| Enlaces a `/` que se quedan sin actualizar y llevan a la landing en vez de a la Biblioteca.                              | Plan, paso 2 lista los archivos; verificar con `grep` de `href="/"` y `router.push("/")` tras el cambio.                                                                                         |
+| El enlace "Acerca de" da 404.                                                                                            | Aceptado por decisión del usuario; se resuelve en la spec de About.                                                                                                                              |
+| Elementos `.reveal` quedan invisibles si el observer no corre (JS desactivado, `prefers-reduced-motion`).                | Comprobar la CSS de la referencia; si hace falta, mostrar el contenido por defecto cuando no hay JS o con movimiento reducido.                                                                   |
+| Diferencias de la Nav/globales de la referencia chocan con estilos ya portados.                                          | Comparar `styles.css` con `globals.css` sección por sección en el paso 1 y verificar que las 5 pantallas existentes no cambian.                                                                  |
+| Mucho CSS sin uso (GAMEPAD, temas).                                                                                      | Aceptado; se usará en la spec de juegos.                                                                                                                                                         |
+| El hero con siluetas animadas puede desbordar en móvil.                                                                  | Revisar con el breakpoint ≤ 840 px y evitar scroll horizontal. Comprobado: el contenido de la home no desborda; el único desbordamiento era el botón de menú de la Nav (corregido en el paso 7). |
+| El servidor de desarrollo (`next dev`) puede servir CSS antiguo tras editar `app/globals.css` (visto durante el paso 7). | Verificar los cambios de CSS con `npm run build` + `npm run start`, o reiniciar `next dev`.                                                                                                      |
 
 ---
 
