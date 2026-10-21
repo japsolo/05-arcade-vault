@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "@/lib/use-session";
 import type { Game } from "@/lib/games";
-import { saveScore } from "@/lib/session";
+import { GameOverModal } from "@/components/game-over-modal";
 
 const LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
@@ -14,11 +14,8 @@ export function GamePlayer({ game }: { game: Game }) {
 	const [score, setScore] = useState(0);
 	const [paused, setPaused] = useState(false);
 	const [over, setOver] = useState(false);
-	const [saved, setSaved] = useState(false);
-	// null = el usuario aún no ha editado el campo; se usa la sesión o INVITADO.
-	const [editedName, setEditedName] = useState<string | null>(null);
 
-	const name = editedName ?? user?.name ?? "INVITADO";
+	const name = user?.name ?? "INVITADO";
 	const level = 1 + Math.floor(score / POINTS_PER_LEVEL);
 
 	// Puntuación simulada: sube sola mientras la partida está en marcha.
@@ -32,12 +29,6 @@ export function GamePlayer({ game }: { game: Game }) {
 		setScore(0);
 		setPaused(false);
 		setOver(false);
-		setSaved(false);
-	};
-
-	const handleSave = () => {
-		saveScore({ game: game.id, score, name });
-		setSaved(true);
 	};
 
 	return (
@@ -114,36 +105,7 @@ export function GamePlayer({ game }: { game: Game }) {
 			</div>
 
 			{over && (
-				<div className="modal-bd">
-					<div className="modal" role="dialog" aria-modal="true">
-						<h2>FIN DEL JUEGO</h2>
-						<div className="final-label">PUNTUACIÓN FINAL</div>
-						<div className="final">{score.toLocaleString("es-ES")}</div>
-						{saved ? (
-							<div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
-						) : (
-							<div className="input-row">
-								<input
-									value={name}
-									onChange={(e) => setEditedName(e.target.value.toUpperCase().slice(0, 10))}
-									placeholder="TUS INICIALES"
-									aria-label="Tus iniciales"
-								/>
-								<button type="button" className="btn yellow" onClick={handleSave}>
-									GUARDAR PUNTUACIÓN
-								</button>
-							</div>
-						)}
-						<div className="actions">
-							<button type="button" className="btn" onClick={restart}>
-								JUGAR DE NUEVO
-							</button>
-							<Link href="/biblioteca" className="btn magenta">
-								VOLVER AL VAULT
-							</Link>
-						</div>
-					</div>
-				</div>
+				<GameOverModal gameId={game.id} score={score} defaultName={name} onRestart={restart} />
 			)}
 		</div>
 	);
