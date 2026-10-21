@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { GamePlayer } from "@/components/game-player";
+import { PLAYABLE } from "@/components/games/registry";
 import { GAMES, getGame } from "@/lib/games";
 
 type ParamsType = Pick<PageProps<"/juegos/[id]/jugar">, "params">;
@@ -39,5 +40,6 @@ async function Player({ params }: ParamsType) {
 	const { id } = await params;
 	const game = getGame(id);
 	if (!game) notFound();
-	return <GamePlayer game={game} />;
+	const GameComponent = PLAYABLE[id] ?? GamePlayer;
+	return <GameComponent game={game} />;
 }
