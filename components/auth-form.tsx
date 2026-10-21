@@ -47,18 +47,10 @@ export function AuthForm() {
 				</div>
 
 				<div className="auth-tabs">
-					<button
-						type="button"
-						className={tab === "in" ? "on" : ""}
-						onClick={() => setTab("in")}
-					>
+					<button type="button" className={tab === "in" ? "on" : ""} onClick={() => setTab("in")}>
 						INICIAR SESIÓN
 					</button>
-					<button
-						type="button"
-						className={tab === "up" ? "on" : ""}
-						onClick={() => setTab("up")}
-					>
+					<button type="button" className={tab === "up" ? "on" : ""} onClick={() => setTab("up")}>
 						CREAR CUENTA
 					</button>
 				</div>
@@ -99,11 +91,7 @@ export function AuthForm() {
 						/>
 					</div>
 
-					<button
-						className="btn lg"
-						type="submit"
-						style={{ width: "100%", marginTop: 8 }}
-					>
+					<button className="btn lg" type="submit" style={{ width: "100%", marginTop: 8 }}>
 						{tab === "in" ? "ENTRAR AL VAULT" : "CREAR Y JUGAR"}
 					</button>
 				</form>

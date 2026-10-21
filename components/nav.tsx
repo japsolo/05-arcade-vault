@@ -11,8 +11,7 @@ export function Nav() {
 	const [open, setOpen] = useState(false);
 
 	const isHome = pathname === "/";
-	const isLibrary =
-		pathname.startsWith("/biblioteca") || pathname.startsWith("/juegos");
+	const isLibrary = pathname.startsWith("/biblioteca") || pathname.startsWith("/juegos");
 	const isHall = pathname.startsWith("/salon");
 	const isAbout = pathname.startsWith("/acerca-de");
 	const isAuth = pathname.startsWith("/acceso");
@@ -73,10 +72,7 @@ export function Nav() {
 
 			{/* biome-ignore lint/a11y/useKeyWithClickEvents: el backdrop solo cierra el panel con el ratón; el teclado usa los enlaces del panel */}
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: ídem */}
-			<div
-				className={`av-mobile-backdrop${open ? " open" : ""}`}
-				onClick={close}
-			/>
+			<div className={`av-mobile-backdrop${open ? " open" : ""}`} onClick={close} />
 			<aside className={`av-mobile-panel${open ? " open" : ""}`}>
 				<div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>
 					MENÚ
@@ -84,21 +80,13 @@ export function Nav() {
 				<Link href="/" className={isHome ? "active" : ""} onClick={close}>
 					Inicio
 				</Link>
-				<Link
-					href="/biblioteca"
-					className={isLibrary ? "active" : ""}
-					onClick={close}
-				>
+				<Link href="/biblioteca" className={isLibrary ? "active" : ""} onClick={close}>
 					Biblioteca
 				</Link>
 				<Link href="/salon" className={isHall ? "active" : ""} onClick={close}>
 					Salón de la Fama
 				</Link>
-				<Link
-					href="/acerca-de"
-					className={isAbout ? "active" : ""}
-					onClick={close}
-				>
+				<Link href="/acerca-de" className={isAbout ? "active" : ""} onClick={close}>
 					Acerca de
 				</Link>
 				<Link href="/acceso" className={isAuth ? "active" : ""} onClick={close}>

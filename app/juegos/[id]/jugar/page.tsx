@@ -10,15 +10,11 @@ export function generateStaticParams() {
 	return GAMES.map((g) => ({ id: g.id }));
 }
 
-export async function generateMetadata({
-	params,
-}: ParamsType): Promise<Metadata> {
+export async function generateMetadata({ params }: ParamsType): Promise<Metadata> {
 	const { id } = await params;
 	const game = getGame(id);
 	return {
-		title: game
-			? `Jugando ${game.title} · Arcade Vault`
-			: "Juego no encontrado",
+		title: game ? `Jugando ${game.title} · Arcade Vault` : "Juego no encontrado",
 	};
 }
 

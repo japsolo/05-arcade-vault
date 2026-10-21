@@ -37,9 +37,7 @@ export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
 	);
 }
 
-async function GameDetail({
-	params,
-}: Pick<PageProps<"/juegos/[id]">, "params">) {
+async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">) {
 	const { id } = await params;
 	const game = getGame(id);
 	if (!game) notFound();

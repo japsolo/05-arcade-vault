@@ -24,10 +24,7 @@ export function GamePlayer({ game }: { game: Game }) {
 	// Puntuación simulada: sube sola mientras la partida está en marcha.
 	useEffect(() => {
 		if (over || paused) return;
-		const t = setInterval(
-			() => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
-			220,
-		);
+		const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
 		return () => clearInterval(t);
 	}, [over, paused]);
 
@@ -67,18 +64,10 @@ export function GamePlayer({ game }: { game: Game }) {
 					</div>
 				</div>
 				<div className="hud-actions">
-					<button
-						type="button"
-						className="btn yellow"
-						onClick={() => setPaused((p) => !p)}
-					>
+					<button type="button" className="btn yellow" onClick={() => setPaused((p) => !p)}>
 						{paused ? "REANUDAR" : "PAUSA"}
 					</button>
-					<button
-						type="button"
-						className="btn magenta"
-						onClick={() => setOver(true)}
-					>
+					<button type="button" className="btn magenta" onClick={() => setOver(true)}>
 						FIN
 					</button>
 					<Link href={`/juegos/${game.id}`} className="btn ghost">
@@ -97,10 +86,7 @@ export function GamePlayer({ game }: { game: Game }) {
 						<div className="player-ship" />
 					</div>
 					{paused && (
-						<div
-							className="crt-content"
-							style={{ background: "rgba(0,0,0,0.6)", zIndex: 5 }}
-						>
+						<div className="crt-content" style={{ background: "rgba(0,0,0,0.6)", zIndex: 5 }}>
 							<div>
 								<div className="pixel neon-yellow" style={{ fontSize: 22 }}>
 									EN PAUSA
@@ -139,9 +125,7 @@ export function GamePlayer({ game }: { game: Game }) {
 							<div className="input-row">
 								<input
 									value={name}
-									onChange={(e) =>
-										setEditedName(e.target.value.toUpperCase().slice(0, 10))
-									}
+									onChange={(e) => setEditedName(e.target.value.toUpperCase().slice(0, 10))}
 									placeholder="TUS INICIALES"
 									aria-label="Tus iniciales"
 								/>

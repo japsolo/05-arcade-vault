@@ -94,10 +94,7 @@ export function HallOfFame() {
 				{user && (
 					<>
 						<div className="tr you-label">▸ TU MEJOR MARCA EN {game.title}</div>
-						<div
-							className="tr you"
-							style={{ animationDelay: `${rows.length * 50 + 50}ms` }}
-						>
+						<div className="tr you" style={{ animationDelay: `${rows.length * 50 + 50}ms` }}>
 							<div className="rk" style={{ color: "var(--yellow)" }}>
 								#{String(youRank).padStart(2, "0")}
 							</div>

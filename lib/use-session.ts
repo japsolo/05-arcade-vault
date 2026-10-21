@@ -22,11 +22,7 @@ const logout = () => writeUser(null);
 // componente ya haya leído localStorage; con un contexto, la Nav (dentro de un
 // Suspense) hidrataba con el usuario y no coincidía con el HTML del servidor.
 export function useSession(): Session {
-	const raw = useSyncExternalStore(
-		subscribeUser,
-		getUserSnapshot,
-		getServerUserSnapshot,
-	);
+	const raw = useSyncExternalStore(subscribeUser, getUserSnapshot, getServerUserSnapshot);
 	const user = useMemo(() => parseUser(raw), [raw]);
 	return useMemo(() => ({ user, login, logout }), [user]);
 }

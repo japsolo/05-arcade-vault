@@ -49,18 +49,18 @@ export type Category = "ARCADE" | "PUZZLE" | "SHOOTER" | "VERSUS";
 export type AccentColor = "cyan" | "magenta" | "green" | "yellow";
 
 export type Game = {
-  id: string;          // slug de la URL, p. ej. "bloque-buster"
-  title: string;       // "BLOQUE BUSTER"
-  short: string;       // descripción corta (tarjeta)
-  long: string;        // descripción larga (detalle)
-  cat: Category;
-  cover: string;       // clase CSS existente en globals.css, p. ej. "cover-bricks"
-  color: AccentColor;  // color del botón JUGAR de la tarjeta
-  best: number;        // mejor puntuación global (mock)
-  plays: string;       // "12.4K" (mock, ya formateado)
+	id: string; // slug de la URL, p. ej. "bloque-buster"
+	title: string; // "BLOQUE BUSTER"
+	short: string; // descripción corta (tarjeta)
+	long: string; // descripción larga (detalle)
+	cat: Category;
+	cover: string; // clase CSS existente en globals.css, p. ej. "cover-bricks"
+	color: AccentColor; // color del botón JUGAR de la tarjeta
+	best: number; // mejor puntuación global (mock)
+	plays: string; // "12.4K" (mock, ya formateado)
 };
 
-export const GAMES: Game[];                 // los 8 juegos de references/data.jsx
+export const GAMES: Game[]; // los 8 juegos de references/data.jsx
 export const CATEGORIES: ("TODOS" | Category)[];
 export function getGame(id: string): Game | undefined;
 ```
@@ -75,7 +75,7 @@ export function seededScores(seed: number, count?: number): ScoreRow[];
 
 ```ts
 // lib/session.ts — solo cliente
-export type User = { name: string };            // MAYÚSCULAS, máx. 10 caracteres
+export type User = { name: string }; // MAYÚSCULAS, máx. 10 caracteres
 // localStorage "av_user": JSON de User, o ausente si no hay sesión
 // localStorage "av_scores": JSON de { game: string; score: number; name: string; at: number }[]
 ```
@@ -156,14 +156,14 @@ Cada paso deja la app compilando y ejecutable.
 
 ## Riesgos identificados
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
+| Riesgo                                                                                                                | Mitigación                                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Next.js 16.4 / React 19.3 tiene cambios incompatibles con lo habitual (p. ej. `params` asíncrono, `cacheComponents`). | Leer la guía correspondiente en `node_modules/next/dist/docs/` antes de escribir cada página. Prestar atención a `generateStaticParams` y a las páginas con `cacheComponents`. |
-| Leer `localStorage` en el render provoca errores de hidratación. | Leerlo con `useSyncExternalStore` en `SessionProvider`; el snapshot de servidor es `null`, así que el primer render asume "sin sesión". |
-| Parpadeo de la Nav (muestra "Iniciar Sesión" y luego el nombre). | Aceptado para el MVP; reservar el espacio del botón para evitar saltos de layout. |
-| `Math.random` en la puntuación simulada del reproductor. | Se ejecuta solo en un efecto de cliente, nunca durante el render. |
-| Las clases CSS de `globals.css` no cubren todo lo que usa la referencia. | Contrastar con `references/styles.css` al implementar cada pantalla y portar solo lo que falte. |
-| Las `localStorage` bloqueadas (modo privado) lanzan excepciones. | Envolver lecturas y escrituras en `try/catch`; la app funciona sin persistir. |
+| Leer `localStorage` en el render provoca errores de hidratación.                                                      | Leerlo con `useSyncExternalStore` en `SessionProvider`; el snapshot de servidor es `null`, así que el primer render asume "sin sesión".                                        |
+| Parpadeo de la Nav (muestra "Iniciar Sesión" y luego el nombre).                                                      | Aceptado para el MVP; reservar el espacio del botón para evitar saltos de layout.                                                                                              |
+| `Math.random` en la puntuación simulada del reproductor.                                                              | Se ejecuta solo en un efecto de cliente, nunca durante el render.                                                                                                              |
+| Las clases CSS de `globals.css` no cubren todo lo que usa la referencia.                                              | Contrastar con `references/styles.css` al implementar cada pantalla y portar solo lo que falte.                                                                                |
+| Las `localStorage` bloqueadas (modo privado) lanzan excepciones.                                                      | Envolver lecturas y escrituras en `try/catch`; la app funciona sin persistir.                                                                                                  |
 
 ---
 

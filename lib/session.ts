@@ -66,9 +66,7 @@ export function writeUser(user: User | null): void {
 
 export function saveScore(entry: Omit<SavedScore, "at">): void {
 	try {
-		const all = JSON.parse(
-			localStorage.getItem(SCORES_KEY) || "[]",
-		) as SavedScore[];
+		const all = JSON.parse(localStorage.getItem(SCORES_KEY) || "[]") as SavedScore[];
 		all.push({ ...entry, at: Date.now() });
 		localStorage.setItem(SCORES_KEY, JSON.stringify(all));
 	} catch {

@@ -18,10 +18,7 @@ function field(formData: FormData, name: string): string {
 	return typeof v === "string" ? v.trim() : "";
 }
 
-export async function sendContact(
-	_prev: ContactState,
-	formData: FormData,
-): Promise<ContactState> {
+export async function sendContact(_prev: ContactState, formData: FormData): Promise<ContactState> {
 	const values: ContactInput = {
 		name: field(formData, "name"),
 		email: field(formData, "email"),

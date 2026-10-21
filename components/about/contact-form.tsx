@@ -9,9 +9,7 @@ const INITIAL: ContactState = { status: "idle" };
 // "ENVIAR OTRO MENSAJE" remonta el formulario (nueva key) para volver al estado inicial de useActionState.
 export function ContactForm() {
 	const [round, setRound] = useState(0);
-	return (
-		<ContactFormRound key={round} onReset={() => setRound((r) => r + 1)} />
-	);
+	return <ContactFormRound key={round} onReset={() => setRound((r) => r + 1)} />;
 }
 
 function ContactFormRound({ onReset }: { onReset: () => void }) {
@@ -20,15 +18,12 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 
 	// Los inputs no son controlados: React vacía el formulario tras cada acción, así que
 	// los valores enviados vuelven en `state.values` como defaultValue cuando hay error.
-	const values =
-		state.status === "error" ? state.values : { name: "", email: "", msg: "" };
+	const values = state.status === "error" ? state.values : { name: "", email: "", msg: "" };
 	const fieldErrors = state.status === "error" ? state.fieldErrors : {};
 
 	const onSubmit = (e: SubmitEvent<HTMLFormElement>) => {
 		const data = new FormData(e.currentTarget);
-		const empty = ["name", "email", "msg"].some(
-			(k) => !String(data.get(k) ?? "").trim(),
-		);
+		const empty = ["name", "email", "msg"].some((k) => !String(data.get(k) ?? "").trim());
 		if (empty) {
 			e.preventDefault(); // no llega a invocar la acción
 			setShake(true);
@@ -54,9 +49,7 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 							placeholder="px_kai"
 							aria-invalid={fieldErrors.name ? true : undefined}
 						/>
-						{fieldErrors.name && (
-							<div className="field-error">{fieldErrors.name}</div>
-						)}
+						{fieldErrors.name && <div className="field-error">{fieldErrors.name}</div>}
 					</div>
 					<div className="field">
 						<label htmlFor="contact-email">CORREO ELECTRÓNICO</label>
@@ -68,9 +61,7 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 							placeholder="jugador@vault.gg"
 							aria-invalid={fieldErrors.email ? true : undefined}
 						/>
-						{fieldErrors.email && (
-							<div className="field-error">{fieldErrors.email}</div>
-						)}
+						{fieldErrors.email && <div className="field-error">{fieldErrors.email}</div>}
 					</div>
 					<div className="field">
 						<label htmlFor="contact-msg">MENSAJE</label>
@@ -82,20 +73,13 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 							placeholder="Cuéntanos qué tienes en mente…"
 							aria-invalid={fieldErrors.msg ? true : undefined}
 						/>
-						{fieldErrors.msg && (
-							<div className="field-error">{fieldErrors.msg}</div>
-						)}
+						{fieldErrors.msg && <div className="field-error">{fieldErrors.msg}</div>}
 					</div>
 
 					{/* Honeypot: invisible para personas; si llega relleno, la acción no envía nada. */}
 					<div className="hp-field" aria-hidden="true">
 						<label htmlFor="contact-website">WEBSITE</label>
-						<input
-							id="contact-website"
-							name="website"
-							tabIndex={-1}
-							autoComplete="off"
-						/>
+						<input id="contact-website" name="website" tabIndex={-1} autoComplete="off" />
 					</div>
 
 					<button
@@ -123,15 +107,14 @@ function ContactFormRound({ onReset }: { onReset: () => void }) {
 					</div>
 					<div className="term-body">
 						<div className="line">
-							<span className="prompt">vault@arcade:~$</span> ./send_message
-							--to=team
+							<span className="prompt">vault@arcade:~$</span> ./send_message --to=team
 						</div>
 						<div className="line dim">[OK] Conectando con servidor…</div>
 						<div className="line dim">[OK] Validando contenido…</div>
 						<div className="line dim">[OK] Transmitiendo paquete…</div>
 						<div className="line success" role="status">
-							&gt; MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS,{" "}
-							{state.name.toUpperCase()}.<span className="caret">_</span>
+							&gt; MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {state.name.toUpperCase()}.
+							<span className="caret">_</span>
 						</div>
 						<div style={{ marginTop: 18 }}>
 							<button className="btn ghost" type="button" onClick={onReset}>
