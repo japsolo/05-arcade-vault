@@ -1,6 +1,6 @@
 # SPEC 04 — Conexión del proyecto con Supabase
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-20
 > **Objetivo:** Conectar la app con el proyecto de Supabase (dependencias, variables de entorno, clientes de servidor y navegador, y proxy) sin crear tablas ni cambiar ninguna pantalla.
@@ -89,22 +89,31 @@ Cada paso deja la app compilando y ejecutable.
 4. **Proxy.** Leer antes la guía de `proxy` en `node_modules/next/dist/docs/01-app/` (Next 16 sustituye `middleware` por `proxy`). Crear `lib/supabase/proxy.ts` con `updateSession` y `proxy.ts` en la raíz. El `matcher` excluye `_next/static`, `_next/image`, `favicon.ico` e imágenes (`svg`, `png`, `jpg`, `jpeg`, `gif`, `webp`). Comprobación: `npm run build` lista el proxy, y en `next dev` todas las rutas se ven igual que antes, sin errores en la consola del servidor.
 5. **Documentación.** Actualizar `CLAUDE.md` con los clientes de `lib/supabase/`, el proxy, las variables `NEXT_PUBLIC_SUPABASE_*` y `npm run supabase:check`. Marcar la SPEC 04 como `Implementado`.
 
+**Desviaciones durante la implementación:**
+
+- Paso 1: se usó la clave publishable `sb_publishable_…`, no la `anon` legacy (JWT) que también devuelve `get_publishable_keys`.
+- Paso 2: el caso de clave inválida se probó sobrescribiendo la variable en la línea de comandos (`--env-file` no pisa variables ya definidas), sin editar `.env`. También se probaron host inexistente (`ENOTFOUND`) y variables ausentes.
+- Paso 4: `@supabase/ssr` 0.12.7 pasa a `setAll` un segundo argumento `headers` (cabeceras anti-caché); `updateSession` las copia a la respuesta. En `server.ts` no se usan porque `cookies()` no da acceso a las cabeceras de respuesta.
+- Paso 4: `next dev` añadió a `AGENTS.md` el bloque `nextjs-agent-feedback` (por `experimental.agentFeedback`); se commitea con el resto.
+- **Observado, sin tocar:** `/juegos/no-existe` responde HTTP 200 con la página de 404 en el cuerpo, con y sin proxy. Viene de antes de esta spec (`notFound()` dentro de `<Suspense>` con streaming). Si se quiere un 404 real, va en otra spec.
+- **Observado, sin tocar:** el IDE marca con Biome `noNonNullAssertion` en `process.env.…!`. El proyecto usa ESLint (que no lo marca) y es el patrón de la guía de Supabase.
+
 ---
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
-- [ ] `package.json` incluye `@supabase/supabase-js` y `@supabase/ssr` en `dependencies`.
-- [ ] `.env.template` incluye `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` sin valores.
-- [ ] Con `.env` correcto, `npm run supabase:check` imprime `✔ SUPABASE OK` y sale con código 0.
-- [ ] Con la clave alterada o sin variables, `npm run supabase:check` imprime `✖` y el motivo, y sale con código 1.
-- [ ] Existen `lib/supabase/server.ts`, `lib/supabase/client.ts`, `lib/supabase/proxy.ts` y `proxy.ts`.
-- [ ] Ningún archivo con `"use client"` importa `lib/supabase/server.ts` ni `lib/supabase/proxy.ts`.
-- [ ] `/`, `/biblioteca`, `/juegos/caida`, `/juegos/caida/jugar`, `/acceso`, `/salon` y `/acerca-de` se ven y funcionan igual que antes.
-- [ ] No hay errores ni warnings de hidratación en la consola en esas rutas, con y sin `av_user` en `localStorage`.
-- [ ] El proyecto de Supabase sigue sin tablas en `public` (`list_tables` vacío) y sin migraciones.
-- [ ] Ninguna clave secreta de Supabase aparece en el repo ni en `.env`.
-- [ ] `CLAUDE.md` documenta los clientes, el proxy, las variables y el script.
+- [x] `npm run lint` y `npm run build` terminan sin errores.
+- [x] `package.json` incluye `@supabase/supabase-js` y `@supabase/ssr` en `dependencies`.
+- [x] `.env.template` incluye `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` sin valores.
+- [x] Con `.env` correcto, `npm run supabase:check` imprime `✔ SUPABASE OK` y sale con código 0.
+- [x] Con la clave alterada o sin variables, `npm run supabase:check` imprime `✖` y el motivo, y sale con código 1.
+- [x] Existen `lib/supabase/server.ts`, `lib/supabase/client.ts`, `lib/supabase/proxy.ts` y `proxy.ts`.
+- [x] Ningún archivo con `"use client"` importa `lib/supabase/server.ts` ni `lib/supabase/proxy.ts`.
+- [x] `/`, `/biblioteca`, `/juegos/caida`, `/juegos/caida/jugar`, `/acceso`, `/salon` y `/acerca-de` se ven y funcionan igual que antes.
+- [x] No hay errores ni warnings de hidratación en la consola en esas rutas, con y sin `av_user` en `localStorage`.
+- [x] El proyecto de Supabase sigue sin tablas en `public` (`list_tables` vacío) y sin migraciones.
+- [x] Ninguna clave secreta de Supabase aparece en el repo ni en `.env`.
+- [x] `CLAUDE.md` documenta los clientes, el proxy, las variables y el script.
 
 ---
 
