@@ -63,7 +63,9 @@ export function createAsteroids(
 
 	function onKeyDown(e: KeyboardEvent) {
 		if (isEditable(e.target)) return;
-		if (SCROLL_KEYS.has(e.code)) e.preventDefault();
+		// En "gameover" el juego no usa teclas y el modal está abierto: ESPACIO debe poder
+		// activar sus botones con el teclado.
+		if (SCROLL_KEYS.has(e.code) && phase !== "gameover") e.preventDefault();
 		const first = !keys[e.code];
 		if (first) justPressed[e.code] = true;
 		keys[e.code] = true;
