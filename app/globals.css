@@ -3592,6 +3592,9 @@ a {
 	color: var(--ink-faint);
 	letter-spacing: 0.16em;
 }
+.controls-hint span {
+	white-space: nowrap;
+}
 .controls-hint kbd {
 	font-family: inherit;
 	color: var(--cyan);

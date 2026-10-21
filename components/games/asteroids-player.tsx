@@ -96,8 +96,21 @@ export function AsteroidsPlayer({ game }: { game: Game }) {
 			</div>
 
 			<p className="controls-hint">
-				<kbd>← →</kbd> ROTAR · <kbd>↑</kbd> PROPULSAR · <kbd>ESPACIO</kbd> DISPARAR · <kbd>P</kbd>{" "}
-				PAUSA
+				<span>
+					<kbd>← →</kbd> ROTAR
+				</span>{" "}
+				·{" "}
+				<span>
+					<kbd>↑</kbd> PROPULSAR
+				</span>{" "}
+				·{" "}
+				<span>
+					<kbd>ESPACIO</kbd> DISPARAR
+				</span>{" "}
+				·{" "}
+				<span>
+					<kbd>P</kbd> PAUSA
+				</span>
 			</p>
 
 			{finalScore !== null && (
