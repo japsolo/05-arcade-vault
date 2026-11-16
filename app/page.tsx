@@ -5,14 +5,16 @@ import { FloatingSilhouettes } from "@/components/home/floating-silhouettes";
 import { HeroCtas, PricingCta } from "@/components/home/home-ctas";
 import { MiniCard } from "@/components/home/mini-card";
 import { Reveal } from "@/components/home/reveal";
-import { GAMES } from "@/lib/games";
+import { getGames } from "@/lib/games";
 import { FAQ, FEATURES, HOME_STATS, PRICE_FEATURES, RECENT_SCORES, TOP_PLAYERS } from "@/lib/home";
 
 export const metadata: Metadata = {
 	title: "Arcade Vault · El arcade clásico está de vuelta",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+	const games = await getGames();
+
 	return (
 		<div className="home fade-in">
 			<Reveal />
@@ -72,7 +74,7 @@ export default function HomePage() {
 					<div className="section-rule" />
 				</div>
 				<div className="mini-rail">
-					{GAMES.slice(0, 6).map((g) => (
+					{games.slice(0, 6).map((g) => (
 						<MiniCard key={g.id} game={g} />
 					))}
 				</div>

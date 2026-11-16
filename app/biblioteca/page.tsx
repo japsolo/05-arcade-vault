@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { LibraryBrowser } from "@/components/library-browser";
+import { CATEGORIES, getGames } from "@/lib/games";
 
 export const metadata: Metadata = {
 	title: "Biblioteca · Arcade Vault",
 };
 
-export default function Home() {
+export default async function Home() {
+	const games = await getGames();
+
 	return (
 		<div className="fade-in">
 			<section className="av-hero">
@@ -14,7 +17,7 @@ export default function Home() {
 					INSERTA UNA MONEDA PARA JUGAR <span className="blink">_</span>
 				</div>
 			</section>
-			<LibraryBrowser />
+			<LibraryBrowser games={games} categories={CATEGORIES} />
 		</div>
 	);
 }

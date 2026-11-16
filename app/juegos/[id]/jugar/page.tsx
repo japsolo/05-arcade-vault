@@ -3,17 +3,18 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { GamePlayer } from "@/components/game-player";
 import { PLAYABLE } from "@/components/games/registry";
-import { GAMES, getGame } from "@/lib/games";
+import { getGame, getGames } from "@/lib/games";
 
 type ParamsType = Pick<PageProps<"/juegos/[id]/jugar">, "params">;
 
-export function generateStaticParams() {
-	return GAMES.map((g) => ({ id: g.id }));
+export async function generateStaticParams() {
+	const games = await getGames();
+	return games.map((g) => ({ id: g.id }));
 }
 
 export async function generateMetadata({ params }: ParamsType): Promise<Metadata> {
 	const { id } = await params;
-	const game = getGame(id);
+	const game = await getGame(id);
 	return {
 		title: game ? `Jugando ${game.title} · Arcade Vault` : "Juego no encontrado",
 	};
@@ -38,7 +39,7 @@ export default function PlayPage({ params }: ParamsType) {
 
 async function Player({ params }: ParamsType) {
 	const { id } = await params;
-	const game = getGame(id);
+	const game = await getGame(id);
 	if (!game) notFound();
 	const GameComponent = PLAYABLE[id] ?? GamePlayer;
 	return <GameComponent game={game} />;
