@@ -1,59 +1,73 @@
-export type ScoreRow = {
+import { cacheLife, cacheTag } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+
+// Como lib/games.ts: los componentes de cliente solo importan tipos de aquí.
+
+export type LeaderboardRow = {
 	rank: number;
 	name: string;
 	score: number;
-	date: string;
+	date: string; // DD/MM/AAAA
 };
 
-const PLAYERS = [
-	"PX_KAI",
-	"NEONFOX",
-	"Z3R0COOL",
-	"M00NRYU",
-	"VAULT_07",
-	"GLITCHA",
-	"ATARI_KID",
-	"CYBER_LU",
-	"MAGENTA88",
-	"SCANLINE",
-	"BIT_LORD",
-	"ARKADYA",
-	"DROID_X",
-	"RGB_QUEEN",
-	"PIXEL_DAD",
-	"RETROVIRA",
-	"VECTORX",
-	"JOY_STK",
-];
+const dateFmt = new Intl.DateTimeFormat("es-ES", {
+	day: "2-digit",
+	month: "2-digit",
+	year: "numeric",
+	timeZone: "Europe/Madrid",
+});
 
-// Puntuaciones deterministas: misma semilla, mismos resultados.
-export function seededScores(seed: number, count = 12): ScoreRow[] {
-	let s = seed;
-	const rand = () => {
-		s = (s * 9301 + 49297) % 233280;
-		return s / 233280;
+type LeaderboardView = {
+	game_id: string | null;
+	name: string | null;
+	score: number | null;
+	created_at: string | null;
+	rank: number | null;
+};
+
+function toRow(r: LeaderboardView): LeaderboardRow {
+	return {
+		rank: r.rank ?? 0,
+		name: r.name ?? "",
+		score: r.score ?? 0,
+		date: r.created_at ? dateFmt.format(new Date(r.created_at)) : "",
 	};
-	const used = new Set<string>();
-	const rows: ScoreRow[] = [];
+}
 
-	for (let i = 0; i < count; i++) {
-		let name: string;
-		do {
-			name = PLAYERS[Math.floor(rand() * PLAYERS.length)];
-		} while (used.has(name) && used.size < PLAYERS.length);
-		used.add(name);
+// Mejor marca de cada nombre en un juego (vista `leaderboard`).
+export async function getLeaderboard(gameId: string, limit: number): Promise<LeaderboardRow[]> {
+	"use cache";
+	cacheTag("scores");
+	cacheLife("hours");
 
-		const base = Math.floor(50000 + rand() * 250000);
-		const score = base - i * Math.floor(2000 + rand() * 4000);
-		const day = String(1 + Math.floor(rand() * 28)).padStart(2, "0");
-		const mon = String(1 + Math.floor(rand() * 12)).padStart(2, "0");
-		rows.push({
-			rank: i + 1,
-			name,
-			score: Math.max(score, 1000),
-			date: `${day}/${mon}/2026`,
-		});
+	const { data, error } = await createPublicClient()
+		.from("leaderboard")
+		.select("*")
+		.eq("game_id", gameId)
+		.lte("rank", limit)
+		.order("rank");
+	if (error) throw error;
+	return data.map(toRow);
+}
+
+// Las clasificaciones de todos los juegos, por id, hasta `limit` filas cada una.
+export async function getAllLeaderboards(limit: number): Promise<Record<string, LeaderboardRow[]>> {
+	"use cache";
+	cacheTag("scores");
+	cacheLife("hours");
+
+	const { data, error } = await createPublicClient()
+		.from("leaderboard")
+		.select("*")
+		.lte("rank", limit)
+		.order("game_id")
+		.order("rank");
+	if (error) throw error;
+
+	const byGame: Record<string, LeaderboardRow[]> = {};
+	for (const r of data) {
+		if (!r.game_id) continue;
+		(byGame[r.game_id] ??= []).push(toRow(r));
 	}
-
-	return rows.sort((a, b) => b.score - a.score).map((r, i) => ({ ...r, rank: i + 1 }));
+	return byGame;
 }
