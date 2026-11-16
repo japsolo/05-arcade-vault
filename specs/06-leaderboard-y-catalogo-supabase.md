@@ -1,6 +1,6 @@
 # SPEC 06 — Catálogo de juegos y leaderboard en Supabase
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 04, SPEC 05
 > **Fecha:** 2026-11-16
 > **Objetivo:** Mover el catálogo de juegos a una tabla `games` y las puntuaciones a una tabla `scores` en Supabase, y mostrar un leaderboard real en el Salón, la ficha del juego y la home.
@@ -221,29 +221,43 @@ Cada paso deja la app compilando y ejecutable. Antes de los pasos 2 y 5, leer en
    - Comprobación: jugar a `rocas`, guardar y ver la marca en `/salon`, en la ficha y en la home sin reiniciar el servidor. En un juego simulado no hay botón GUARDAR. Un nombre como `ñu-1` se guarda como `U1`.
 6. **Documentación.** Actualizar `CLAUDE.md`: tablas, vistas, RLS, cliente público, caché y tags, `submitScore`, la desaparición de `av_scores` y de los datos mock, y que el catálogo vive en la DB. Marcar la SPEC 06 como `Implementado`.
 
+**Desviaciones durante la implementación:**
+
+- Paso 1: el archivo de la migración se renombró a `20261116181953_games_scores.sql`, que es la versión que registró `apply_migration` (no la hora en que se escribió el archivo).
+- Paso 1: además de RLS, la migración revoca a `anon` y `authenticated` los permisos `INSERT`/`UPDATE`/`DELETE`/`TRUNCATE` sobre `games` y `UPDATE`/`DELETE`/`TRUNCATE` sobre `scores`, como segunda barrera.
+- Paso 1: se tipó también `lib/supabase/proxy.ts` con `Database`, no solo `server.ts` y `client.ts`.
+- Paso 2: `LibraryBrowser` recibe también `categories` por props. Un componente de cliente que importe un valor de `lib/games.ts` arrastra las funciones `'use cache'` a su bundle y rompe la compilación. Los componentes de cliente solo importan tipos de `lib/games.ts` y `lib/scores.ts`.
+- Paso 3: `lib/score-rules.ts` se creó en este paso (con `sanitizeName`), porque «TU MEJOR MARCA» lo necesita. En el paso 5 se completó.
+- Paso 3: las fechas del ranking se formatean con `timeZone: "Europe/Madrid"`, para que el día no dependa del huso horario del servidor.
+- Paso 3: «TU MEJOR MARCA» muestra el nombre del ranking (saneado) y no el de la sesión.
+- Paso 4: `RecentScore` lleva también `when` («hace 5 min»). Se calcula dentro de `getRecentScores`, al construir la caché, y no al renderizar. Con `cacheComponents`, `Date.now()` fuera de `'use cache'` impide pre-renderizar la home.
+- Paso 5: `submitScore` recibe un objeto y se llama desde el modal con `useTransition`, no con `useActionState`/`FormData`. GUARDAR también se deshabilita si el nombre queda vacío tras sanear.
+- Paso 5: si la puntuación es 0, el modal muestra «✖ PUNTUACIÓN NO VÁLIDA» al pulsar GUARDAR.
+- **Observado, sin tocar:** una fila insertada a mano por SQL no invalida la caché. Solo `submitScore` llama a `updateTag("scores")`. En `next dev`, una petición con `Cache-Control: no-cache` la salta.
+
 ---
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
-- [ ] Existe `supabase/migrations/<timestamp>_games_scores.sql`, y `list_migrations` la muestra aplicada.
-- [ ] `games` tiene 8 filas y solo `rocas` tiene `playable = true`.
-- [ ] `scores` tiene RLS activado, `SELECT` público, `INSERT` con `WITH CHECK` y ninguna política de `UPDATE` ni `DELETE`.
-- [ ] Un `INSERT` en `scores` como `anon` con `game_id = 'caida'`, `name = 'abc'` o `score = 0` es rechazado.
-- [ ] `get_advisors` (security) no muestra avisos sobre `games`, `scores`, las vistas ni `rls_auto_enable`.
-- [ ] Existe `lib/supabase/database.types.ts`, y los tres clientes de `lib/supabase/` y `public.ts` están tipados con `Database`.
-- [ ] Ningún archivo del repo importa `GAMES`, `seededScores`, `saveScore`, `RECENT_SCORES` ni `TOP_PLAYERS`, y la cadena `av_scores` no aparece en el código.
-- [ ] `/`, `/biblioteca`, `/juegos/[id]`, `/juegos/[id]/jugar` y `/salon` muestran los 8 juegos en el orden actual.
-- [ ] Con `scores` vacío, cada vista muestra su estado vacío y «Mejor global» se ve como «—».
-- [ ] Con dos partidas del mismo nombre en `rocas`, el ranking de la ficha y del Salón muestra ese nombre una sola vez, con su mejor marca.
-- [ ] Al guardar una partida de `rocas`, la marca aparece en `/salon`, en la ficha de `rocas`, en «ÚLTIMAS PUNTUACIONES» y en «TOP JUGADORES · HOY» al navegar a esas rutas, sin reiniciar el servidor.
-- [ ] «Mejor global» y «Partidas» de `rocas` se actualizan tras guardar.
-- [ ] Con sesión iniciada y una marca guardada con ese nombre, la fila «TU MEJOR MARCA» de `/salon` muestra su posición y puntuación reales. Sin marca, muestra «AÚN SIN MARCA EN {JUEGO}».
-- [ ] En los juegos simulados, el modal FIN DEL JUEGO no muestra el input ni el botón GUARDAR.
-- [ ] Si `submitScore` falla (p. ej. URL de Supabase alterada), el modal muestra el error y permite reintentar.
-- [ ] No hay errores ni warnings de hidratación en la consola en esas rutas, con y sin `av_user` en `localStorage`.
-- [ ] Ninguna clave secreta de Supabase aparece en el repo ni en `.env`.
-- [ ] `CLAUDE.md` documenta tablas, vistas, RLS, caché y `submitScore`.
+- [x] `npm run lint` y `npm run build` terminan sin errores.
+- [x] Existe `supabase/migrations/<timestamp>_games_scores.sql`, y `list_migrations` la muestra aplicada.
+- [x] `games` tiene 8 filas y solo `rocas` tiene `playable = true`.
+- [x] `scores` tiene RLS activado, `SELECT` público, `INSERT` con `WITH CHECK` y ninguna política de `UPDATE` ni `DELETE`.
+- [x] Un `INSERT` en `scores` como `anon` con `game_id = 'caida'`, `name = 'abc'` o `score = 0` es rechazado.
+- [x] `get_advisors` (security) no muestra avisos sobre `games`, `scores`, las vistas ni `rls_auto_enable`.
+- [x] Existe `lib/supabase/database.types.ts`, y los tres clientes de `lib/supabase/` y `public.ts` están tipados con `Database`.
+- [x] Ningún archivo del repo importa `GAMES`, `seededScores`, `saveScore`, `RECENT_SCORES` ni `TOP_PLAYERS`, y la cadena `av_scores` no aparece en el código.
+- [x] `/`, `/biblioteca`, `/juegos/[id]`, `/juegos/[id]/jugar` y `/salon` muestran los 8 juegos en el orden actual.
+- [x] Con `scores` vacío, cada vista muestra su estado vacío y «Mejor global» se ve como «—».
+- [x] Con dos partidas del mismo nombre en `rocas`, el ranking de la ficha y del Salón muestra ese nombre una sola vez, con su mejor marca.
+- [x] Al guardar una partida de `rocas`, la marca aparece en `/salon`, en la ficha de `rocas`, en «ÚLTIMAS PUNTUACIONES» y en «TOP JUGADORES · HOY» al navegar a esas rutas, sin reiniciar el servidor.
+- [x] «Mejor global» y «Partidas» de `rocas` se actualizan tras guardar.
+- [x] Con sesión iniciada y una marca guardada con ese nombre, la fila «TU MEJOR MARCA» de `/salon` muestra su posición y puntuación reales. Sin marca, muestra «AÚN SIN MARCA EN {JUEGO}».
+- [x] En los juegos simulados, el modal FIN DEL JUEGO no muestra el input ni el botón GUARDAR.
+- [x] Si `submitScore` falla (p. ej. URL de Supabase alterada), el modal muestra el error y permite reintentar.
+- [x] No hay errores ni warnings de hidratación en la consola en esas rutas, con y sin `av_user` en `localStorage`.
+- [x] Ninguna clave secreta de Supabase aparece en el repo ni en `.env`.
+- [x] `CLAUDE.md` documenta tablas, vistas, RLS, caché y `submitScore`.
 
 ---
 
@@ -291,14 +305,15 @@ Cada paso deja la app compilando y ejecutable. Antes de los pasos 2 y 5, leer en
 
 ## Riesgos identificados
 
-| Riesgo                                                                                              | Mitigación                                                                                                                        |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Sin auth, cualquiera puede insertar puntuaciones falsas llamando a la API de Supabase directamente. | RLS limita nombre, rango y juego jugable. Aceptado hasta la spec de auth, que añadirá `user_id`.                                  |
-| Leer `cookies()` dentro de `'use cache'` rompe en runtime aunque `next build` pase.                 | Todas las lecturas cacheadas usan `lib/supabase/public.ts`, que no toca cookies. Solo `submitScore` usa `lib/supabase/server.ts`. |
-| `generateStaticParams` y el pre-render necesitan Supabase disponible durante `next build`.          | Las variables `NEXT_PUBLIC_SUPABASE_*` ya están en `.env`. Si Supabase falla, el build falla y no se publica un catálogo vacío.   |
-| El top «de hoy» y el «hace X min» quedan congelados mientras dure la caché.                         | `cacheLife("minutes")` en la actividad de la home.                                                                                |
-| `PLAYABLE` (código) y `games.playable` (DB) se desincronizan.                                       | Documentarlo en `CLAUDE.md`. Un juego registrado pero sin `playable` simplemente no puede guardar.                                |
-| El servidor de desarrollo se queda con un build antiguo.                                            | No lanzar `build` con `dev` corriendo. Si pasa, `rm -rf .next`.                                                                   |
+| Riesgo                                                                                                                                                                                     | Mitigación                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Sin auth, cualquiera puede insertar puntuaciones falsas llamando a la API de Supabase directamente.                                                                                        | RLS limita nombre, rango y juego jugable. Aceptado hasta la spec de auth, que añadirá `user_id`.                                     |
+| Leer `cookies()` dentro de `'use cache'` rompe en runtime aunque `next build` pase.                                                                                                        | Todas las lecturas cacheadas usan `lib/supabase/public.ts`, que no toca cookies. Solo `submitScore` usa `lib/supabase/server.ts`.    |
+| `generateStaticParams` y el pre-render necesitan Supabase disponible durante `next build`.                                                                                                 | Las variables `NEXT_PUBLIC_SUPABASE_*` ya están en `.env`. Si Supabase falla, el build falla y no se publica un catálogo vacío.      |
+| El top «de hoy» y el «hace X min» quedan congelados mientras dure la caché.                                                                                                                | `cacheLife("minutes")` en la actividad de la home.                                                                                   |
+| `PLAYABLE` (código) y `games.playable` (DB) se desincronizan.                                                                                                                              | Documentarlo en `CLAUDE.md`. Un juego registrado pero sin `playable` simplemente no puede guardar.                                   |
+| Una migración cambia `games` (p. ej. `playable`) y un servidor en marcha sigue sirviendo el catálogo anterior: la app nunca invalida el tag `games` y `getGames` usa `cacheLife("hours")`. | Un deploy o un reinicio del servidor lo resuelve; si no, se actualiza al caducar la caché. Observado al probar el error de guardado. |
+| El servidor de desarrollo se queda con un build antiguo.                                                                                                                                   | No lanzar `build` con `dev` corriendo. Si pasa, `rm -rf .next`.                                                                      |
 
 ---
 
