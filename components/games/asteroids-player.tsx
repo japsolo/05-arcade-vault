@@ -114,7 +114,13 @@ export function AsteroidsPlayer({ game }: { game: Game }) {
 			</p>
 
 			{finalScore !== null && (
-				<GameOverModal gameId={game.id} score={finalScore} defaultName={name} onRestart={restart} />
+				<GameOverModal
+					gameId={game.id}
+					playable={game.playable}
+					score={finalScore}
+					defaultName={name}
+					onRestart={restart}
+				/>
 			)}
 		</div>
 	);
