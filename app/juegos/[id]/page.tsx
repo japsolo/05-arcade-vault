@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getGame, getGames } from "@/lib/games";
-import { seededScores } from "@/lib/scores";
+import { getLeaderboard } from "@/lib/scores";
 
 export async function generateStaticParams() {
 	const games = await getGames();
@@ -43,7 +43,7 @@ async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">)
 	const game = await getGame(id);
 	if (!game) notFound();
 
-	const scores = seededScores(id.length * 17 + 3, 10);
+	const scores = await getLeaderboard(id, 10);
 
 	return (
 		<div className="av-detail fade-in">
@@ -104,6 +104,23 @@ async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">)
 			<aside>
 				<div className="leaderboard">
 					<h3>MEJORES PUNTUACIONES</h3>
+					{scores.length === 0 && (
+						<div
+							className="pixel"
+							style={{
+								fontSize: 9,
+								lineHeight: 1.8,
+								letterSpacing: "0.12em",
+								color: "var(--ink-faint)",
+								padding: "24px 4px",
+								textAlign: "center",
+							}}
+						>
+							{game.playable
+								? "AÚN NO HAY PUNTUACIONES · SÉ EL PRIMERO"
+								: "RANKING DISPONIBLE CUANDO EL JUEGO SEA JUGABLE"}
+						</div>
+					)}
 					{scores.map((r, i) => (
 						<div
 							key={r.name}
