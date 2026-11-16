@@ -6,14 +6,16 @@ import { HeroCtas, PricingCta } from "@/components/home/home-ctas";
 import { MiniCard } from "@/components/home/mini-card";
 import { Reveal } from "@/components/home/reveal";
 import { getGames } from "@/lib/games";
-import { FAQ, FEATURES, HOME_STATS, PRICE_FEATURES, RECENT_SCORES, TOP_PLAYERS } from "@/lib/home";
+import { FAQ, FEATURES, HOME_STATS, PRICE_FEATURES } from "@/lib/home";
+import { getRecentScores, getTopToday } from "@/lib/scores";
 
 export const metadata: Metadata = {
 	title: "Arcade Vault · El arcade clásico está de vuelta",
 };
 
 export default async function HomePage() {
-	const games = await getGames();
+	const [games, recent, top] = await Promise.all([getGames(), getRecentScores(7), getTopToday(5)]);
+	const topScore = top[0]?.score ?? 1;
 
 	return (
 		<div className="home fade-in">
@@ -111,10 +113,15 @@ export default async function HomePage() {
 							<div className="ac-title pixel">▸ ÚLTIMAS PUNTUACIONES</div>
 						</div>
 						<div className="ticker">
-							{RECENT_SCORES.map((r, i) => (
-								<div key={r.player} className="tick-row" style={{ animationDelay: `${i * 60}ms` }}>
+							{recent.length === 0 && <ActivityEmpty text="SIN PARTIDAS TODAVÍA" />}
+							{recent.map((r, i) => (
+								<div
+									key={`${r.at}-${r.player}`}
+									className="tick-row"
+									style={{ animationDelay: `${i * 60}ms` }}
+								>
 									<span className={`tk-p neon-${r.color}`}>{r.player}</span>
-									<span className="tk-mid">▸ {r.game}</span>
+									<span className="tk-mid">▸ {r.gameTitle}</span>
 									<span className="tk-s">+{r.score.toLocaleString("es-ES")}</span>
 									<span className="tk-t">{r.when}</span>
 								</div>
@@ -130,14 +137,18 @@ export default async function HomePage() {
 							</Link>
 						</div>
 						<div className="top-list">
-							{TOP_PLAYERS.map((r, i) => (
+							{top.length === 0 && <ActivityEmpty text="NADIE HA JUGADO HOY" />}
+							{top.map((r, i) => (
 								<div
-									key={r.player}
+									key={r.rank}
 									className={`top-row${i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : ""}`}
 								>
 									<span className="tp-rk">#{String(r.rank).padStart(2, "0")}</span>
 									<span className="tp-bar">
-										<span className="tp-fill" style={{ width: `${100 - i * 16}%` }} />
+										<span
+											className="tp-fill"
+											style={{ width: `${Math.round((r.score / topScore) * 100)}%` }}
+										/>
 									</span>
 									<span className="tp-p">{r.player}</span>
 									<span className="tp-s">{r.score.toLocaleString("es-ES")}</span>
@@ -197,6 +208,23 @@ export default async function HomePage() {
 				</Link>
 				<div className="final-tag">Gratis. Sin registro obligatorio. Empieza en segundos.</div>
 			</section>
+		</div>
+	);
+}
+
+function ActivityEmpty({ text }: { text: string }) {
+	return (
+		<div
+			className="pixel"
+			style={{
+				padding: "28px 8px",
+				textAlign: "center",
+				fontSize: 9,
+				letterSpacing: "0.14em",
+				color: "var(--ink-faint)",
+			}}
+		>
+			{text}
 		</div>
 	);
 }
