@@ -2,15 +2,7 @@
 
 export type User = { name: string };
 
-export type SavedScore = {
-	game: string;
-	score: number;
-	name: string;
-	at: number;
-};
-
 const USER_KEY = "av_user";
-const SCORES_KEY = "av_scores";
 
 // Fuente externa para useSyncExternalStore. El snapshot es el string crudo
 // (valor primitivo, estable entre lecturas).
@@ -62,14 +54,4 @@ export function writeUser(user: User | null): void {
 	listeners.forEach((l) => {
 		l();
 	});
-}
-
-export function saveScore(entry: Omit<SavedScore, "at">): void {
-	try {
-		const all = JSON.parse(localStorage.getItem(SCORES_KEY) || "[]") as SavedScore[];
-		all.push({ ...entry, at: Date.now() });
-		localStorage.setItem(SCORES_KEY, JSON.stringify(all));
-	} catch {
-		// Sin persistencia disponible: se ignora.
-	}
 }

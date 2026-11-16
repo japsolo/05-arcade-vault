@@ -105,7 +105,13 @@ export function GamePlayer({ game }: { game: Game }) {
 			</div>
 
 			{over && (
-				<GameOverModal gameId={game.id} score={score} defaultName={name} onRestart={restart} />
+				<GameOverModal
+					gameId={game.id}
+					playable={game.playable}
+					score={score}
+					defaultName={name}
+					onRestart={restart}
+				/>
 			)}
 		</div>
 	);

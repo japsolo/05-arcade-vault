@@ -11,3 +11,13 @@ export function sanitizeName(raw: string): string {
 		.replace(/[^A-Z0-9_]/g, "")
 		.slice(0, 10);
 }
+
+export type SubmitScoreInput = { gameId: string; name: string; score: number };
+export type SubmitScoreState = { status: "idle" | "saved" | "error"; message?: string };
+
+// null = válido; si no, el motivo para mostrar en el modal.
+export function validateScore({ name, score }: SubmitScoreInput): string | null {
+	if (!NAME_RE.test(name)) return "✖ INICIALES: 1-10 LETRAS, NÚMEROS O _";
+	if (!Number.isInteger(score) || score < 1 || score > SCORE_MAX) return "✖ PUNTUACIÓN NO VÁLIDA";
+	return null;
+}
