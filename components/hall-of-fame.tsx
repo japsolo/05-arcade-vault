@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSession } from "@/lib/use-session";
-import { GAMES } from "@/lib/games";
+import type { Game } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 
 const fmt = (n: number) => n.toLocaleString("es-ES");
 
-export function HallOfFame() {
+export function HallOfFame({ games }: { games: Game[] }) {
 	const { user } = useSession();
-	const [tab, setTab] = useState(GAMES[0].id);
+	const [tab, setTab] = useState(games[0].id);
 
-	const game = GAMES.find((g) => g.id === tab) ?? GAMES[0];
+	const game = games.find((g) => g.id === tab) ?? games[0];
 	const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
 
 	// "Tu mejor marca" es un dato mock, igual que en la referencia.
@@ -29,7 +29,7 @@ export function HallOfFame() {
 			</div>
 
 			<div className="hall-tabs">
-				{GAMES.map((g) => (
+				{games.map((g) => (
 					<button
 						type="button"
 						key={g.id}

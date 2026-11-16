@@ -2,18 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { GameCard } from "@/components/game-card";
-import { CATEGORIES, GAMES } from "@/lib/games";
+import type { CATEGORIES, Game } from "@/lib/games";
 
-export function LibraryBrowser() {
+type LibraryBrowserProps = {
+	games: Game[];
+	categories: typeof CATEGORIES;
+};
+
+// Los datos llegan del Server Component: lib/games.ts no se importa en el cliente.
+export function LibraryBrowser({ games, categories }: LibraryBrowserProps) {
 	const [q, setQ] = useState("");
-	const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("TODOS");
+	const [cat, setCat] = useState<(typeof categories)[number]>("TODOS");
 
 	const filtered = useMemo(() => {
 		const needle = q.toLowerCase();
-		return GAMES.filter(
+		return games.filter(
 			(g) => (cat === "TODOS" || g.cat === cat) && g.title.toLowerCase().includes(needle),
 		);
-	}, [q, cat]);
+	}, [games, q, cat]);
 
 	return (
 		<>
@@ -28,7 +34,7 @@ export function LibraryBrowser() {
 					/>
 				</div>
 				<div className="av-chips">
-					{CATEGORIES.map((c) => (
+					{categories.map((c) => (
 						<button
 							type="button"
 							key={c}

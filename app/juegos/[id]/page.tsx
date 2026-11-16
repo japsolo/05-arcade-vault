@@ -2,18 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { GAMES, getGame } from "@/lib/games";
+import { getGame, getGames } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 
-export function generateStaticParams() {
-	return GAMES.map((g) => ({ id: g.id }));
+export async function generateStaticParams() {
+	const games = await getGames();
+	return games.map((g) => ({ id: g.id }));
 }
 
 export async function generateMetadata({
 	params,
 }: Pick<PageProps<"/juegos/[id]">, "params">): Promise<Metadata> {
 	const { id } = await params;
-	const game = getGame(id);
+	const game = await getGame(id);
 	return {
 		title: game ? `${game.title} · Arcade Vault` : "Juego no encontrado",
 	};
@@ -39,7 +40,7 @@ export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
 
 async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">) {
 	const { id } = await params;
-	const game = getGame(id);
+	const game = await getGame(id);
 	if (!game) notFound();
 
 	const scores = seededScores(id.length * 17 + 3, 10);
@@ -62,7 +63,7 @@ async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">)
 					<div className="stat-strip">
 						<div>
 							<div className="l">Partidas</div>
-							<div className="v">{game.plays}</div>
+							<div className="v">{game.plays.toLocaleString("es-ES")}</div>
 						</div>
 						<div>
 							<div className="l">Mejor global</div>
@@ -73,7 +74,7 @@ async function GameDetail({ params }: Pick<PageProps<"/juegos/[id]">, "params">)
 									textShadow: "0 0 6px rgba(255,0,110,0.5)",
 								}}
 							>
-								{game.best.toLocaleString("es-ES")}
+								{game.best?.toLocaleString("es-ES") ?? "—"}
 							</div>
 						</div>
 						<div>

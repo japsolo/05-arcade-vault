@@ -46,7 +46,7 @@ export function GameCard({ game }: { game: Game }) {
 				<div className="row">
 					<div className="score-badge">
 						<span>MEJOR PUNTUACIÓN</span>
-						<b>{game.best.toLocaleString("es-ES")}</b>
+						<b>{game.best?.toLocaleString("es-ES") ?? "—"}</b>
 					</div>
 					<Link
 						href={href}

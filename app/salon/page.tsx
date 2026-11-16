@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { HallOfFame } from "@/components/hall-of-fame";
+import { getGames } from "@/lib/games";
 
 export const metadata: Metadata = {
 	title: "Salón de la Fama · Arcade Vault",
 };
 
-export default function HallPage() {
-	return <HallOfFame />;
+export default async function HallPage() {
+	const games = await getGames();
+	return <HallOfFame games={games} />;
 }
